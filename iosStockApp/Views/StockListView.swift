@@ -33,7 +33,13 @@ struct StockListView: View {
                     }
                 }
             }
-            Section(header: Text("test")) {
+            Section(header: Text("PORTFOLIO")) {
+                ForEach(self.listVM.portfolioItems, id: \.ticker) { stock in
+                    PortfolioCellView(stock: stock)
+                }
+            }
+            
+            Section(header: Text("FAVORITES")) {
                 ForEach(self.listVM.stocks, id: \.ticker) { stock in
                     StockCellView(stock: stock)
                 }
@@ -44,8 +50,16 @@ struct StockListView: View {
                     listVM.stocks.remove(atOffsets: indexSet)
                 }
             }
+            Link("Powered by Tiingo", destination: URL(string: "https://www.tiingo.com")!)
+                .font(.body)
+                .foregroundColor(.gray)
+                .frame(maxWidth: .infinity, alignment: .center)
+
         }
         .listStyle(PlainListStyle()) //used to get rid of padding
+        
+        
+        
         
     }
 //
@@ -89,11 +103,58 @@ struct StockCellView: View {
     
 }
 
+struct PortfolioCellView: View {
+    
+    let stock: StockViewModel
+    
+    var body: some View {
+        
+        return HStack {
+            
+            VStack(alignment: .leading) {
+                Text(stock.ticker)
+                    .font(.custom("Arial",size: 22))
+                    .fontWeight(.bold)
+                    .padding(EdgeInsets(top: 0, leading: 0, bottom: 5, trailing: 0))
+                
+                Text(stock.numShares)
+                    .padding(5)
+                    .foregroundColor(.gray)
+                
+            }
+            
+            Spacer()
+            
+            VStack {
+                Text("\(stock.price)")
+                    .font(.custom("Arial",size: 22))
+                
+                Text(stock.change)
+                    .padding(5)
+                    .foregroundColor(Color.green)
+            }
+            
+        }
+        
+    }
+    
+}
+
+
+
 
 struct StockListView_Previews: PreviewProvider {
     static var previews: some View {
         
-        let stock = Stock("AAPL", 0, 0)
-        //        return StockListView(stocks: [StockViewModel(stock)])
+        let previewListVM = StockListViewModel()
+        previewListVM.load()
+        return StockListView(listVM: previewListVM)
+    }
+}
+
+struct portfolioCell_Previews: PreviewProvider {
+    static var previews: some View {
+        let stockVM = StockViewModel(Stock("AAPL"))
+        return PortfolioCellView(stock: stockVM)
     }
 }

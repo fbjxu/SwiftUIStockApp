@@ -24,13 +24,18 @@ struct ContentView: View {
 //        let showStocks = self.stockListVM.stocks
         NavigationView{
 //            StockListView(stocks: showStocks)
-            StockListView(listVM: self.stockListVM)
-                .onReceive(timer) { input in
-                    stockListVM.refresh()
-                }
-            
-            .navigationTitle("Stock")
-            .navigationBarItems(trailing: EditButton())
+            ZStack(alignment: .leading) {
+                StockListView(listVM: self.stockListVM)
+                    .onReceive(timer) { input in
+                        stockListVM.refresh()
+                    }
+                
+                .navigationTitle("Stock")
+                .navigationBarItems(trailing: EditButton())
+                
+                
+            }
+           
         }
         
     }

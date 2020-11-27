@@ -11,14 +11,24 @@ import SwiftyJSON
 
 class Webservice {
     
-    func summaryAPI(_ ticker: String, _ stockListVM: StockListViewModel) {
+    //addTickerAPI adds the input ticker to the passed in StockListVM and update its price via REST
+    func addTickerAPI(_ ticker: String, _ stockListVM: StockListViewModel, _ portfolioOption: Bool = false, _ numShares: Double = 0) {
         let url = "http://angularfinance-env.eba-m6bbnkf3.us-east-1.elasticbeanstalk.com/api/pricesummary/"+ticker //unique URL
         AF.request(url).validate().responseData{ (response) in
             
             let stockPriceInfo = try! JSON(data: response.data!) //converting response JSON to the swifty JSON struct
-            let stock = Stock(ticker, stockPriceInfo[0]["last"].doubleValue, stockPriceInfo[0]["prevClose"].doubleValue - stockPriceInfo[0]["last"].doubleValue)
-            let newStockViewModel = StockViewModel(stock)
-            stockListVM.stocks.append(newStockViewModel)
+            let stock = Stock(ticker)
+            stock.price = stockPriceInfo[0]["last"].doubleValue
+            stock.change = stockPriceInfo[0]["prevClose"].doubleValue - stockPriceInfo[0]["last"].doubleValue
+            if portfolioOption {
+                stock.numShares = numShares
+            }
+            if portfolioOption {
+                stockListVM.portfolioItems.append(StockViewModel(stock))
+            }
+            else {
+                stockListVM.stocks.append(StockViewModel(stock))
+            }
             print("got summary API")
             print(stockListVM.stocks)
         }

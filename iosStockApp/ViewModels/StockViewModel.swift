@@ -23,6 +23,10 @@ struct StockViewModel {
         return String(format: "%.2f", self.stock.change)
     }
     
+    var numShares:String {
+        return String(format: "%.2f", self.stock.numShares)
+    }
+    
     init(_ stock: Stock) {
         self.stock = stock
     }

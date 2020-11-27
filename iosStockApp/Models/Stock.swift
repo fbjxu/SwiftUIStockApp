@@ -11,11 +11,13 @@ class Stock: Codable {
     let ticker: String
     var price: Double
     var change: Double
+    var numShares: Double
     
-    init(_ ticker:String, _ price: Double, _ change: Double) {
+    init(_ ticker:String) {
         self.ticker = ticker
-        self.price = price
-        self.change = change
+        self.price = 0
+        self.change = 0
+        self.numShares = 0
     }
 }
 

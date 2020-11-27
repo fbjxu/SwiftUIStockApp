@@ -23,10 +23,13 @@ class Storageservice {
     
     init() {
         //testing version
-        self.portfolioList = []
-        self.watchList = [WatchListItem(ticker: "AAPL"), WatchListItem(ticker: "GOOGL"), WatchListItem(ticker: "AMZN"), WatchListItem(ticker: "FB")] //hard code
+        portfolioList = [PortfolioItem(ticker: "AAPL", numShares: 10),PortfolioItem(ticker: "GOOGL", numShares: 12),PortfolioItem(ticker: "TSLA", numShares: 5)]
+        watchList = [WatchListItem(ticker: "AAPL"), WatchListItem(ticker: "GOOGL"), WatchListItem(ticker: "AMZN"), WatchListItem(ticker: "FB")] //hard code
         if let encoded = try? JSONEncoder().encode(watchList) {
             UserDefaults.standard.set(encoded, forKey: "watchlistItems")
+        }
+        if let portfolioEncoded = try? JSONEncoder().encode(portfolioList) {
+            UserDefaults.standard.set(portfolioEncoded, forKey: "portfolioItems")
         }
         //production version
 //        do {
@@ -96,7 +99,7 @@ class Storageservice {
         oldWatchList.append(WatchListItem(ticker: inputTicker))
         self.watchList = oldWatchList
         if let encoded = try? JSONEncoder().encode(oldWatchList) {
-            Webservice().summaryAPI(inputTicker, listVM) //this add the new ticker and ask for the latest stock price
+            Webservice().addTickerAPI(inputTicker, listVM) //this add the new ticker and ask for the latest stock price
             UserDefaults.standard.set(encoded, forKey: "watchlistItems")
             print("addWatchlistItem ", String(data: encoded, encoding: .utf8)!)
         }
@@ -107,7 +110,7 @@ class Storageservice {
         let oldWatchList = self.getWatchlist()
         var newWatchlist = [WatchListItem]()
         for watchlistItem in oldWatchList { //iterate old watchlist and create new list without the input ticker stock
-            if (watchlistItem.ticker != inputTicker) {
+            if (watchlistItem.ticker.uppercased() != inputTicker.uppercased()) {
                 newWatchlist.append(WatchListItem(ticker: watchlistItem.ticker))
             }
         }
