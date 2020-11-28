@@ -11,8 +11,12 @@ import SwiftUI
 
 struct ContentView: View {
     @ObservedObject private var stockListVM = StockListViewModel()
+    @State var isShowingList = true
     
-    let timer = Timer.publish(every: 15, on: .main, in: .common).autoconnect()
+    var planets = ["Mercury", "Venus", "Earth", "Mars"]
+    @ObservedObject var searchBar = SearchBar()
+    
+    let timer = Timer.publish(every: 15, on: .main, in: .common).autoconnect() //for refreshing stock prices
     
     init() {
         stockListVM.load()
@@ -21,31 +25,53 @@ struct ContentView: View {
     }
     
     var body: some View {
-//        let showStocks = self.stockListVM.stocks
         NavigationView{
-//            StockListView(stocks: showStocks)
-            ZStack(alignment: .leading) {
-                StockListView(listVM: self.stockListVM)
-                    .onReceive(timer) { input in
-                        stockListVM.refresh()
+            VStack(alignment: .leading, spacing: 0) {
+                //search part
+                List {
+                    ForEach(
+                        planets.filter {
+                            searchBar.text.isEmpty ||
+                                $0.localizedStandardContains(searchBar.text)
+                        },
+                        id: \.self
+                    ) { eachPlanet in
+                        Text(eachPlanet)
                     }
-                
+                }
+                .listStyle(PlainListStyle()) //used to get rid of padding
+                .add(self.searchBar)
                 .navigationTitle("Stock")
                 .navigationBarItems(trailing: EditButton())
                 
+                //stock list part
+                if(self.searchBar.text.isEmpty){
+                    StockListView(listVM: self.stockListVM)
+                        .onReceive(timer) { input in
+                            stockListVM.refresh()
+                        }
+                }
+                
+                
+                
                 
             }
-           
+            
         }
+        
         
     }
     
-  
+    
 }
 
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView()
+        Group {
+            ContentView()
+            ContentView()
+            ContentView()
+        }
     }
 }

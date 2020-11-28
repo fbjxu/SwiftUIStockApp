@@ -13,6 +13,11 @@ struct StockListView: View {
     
     //    let stocks: [StockViewModel]
     @ObservedObject var listVM: StockListViewModel
+    
+//    var planets = ["Mercury", "Venus", "Earth", "Mars"]
+//    @ObservedObject var searchBar = SearchBar()
+    
+    
     //used for input field
     @State private var newStock = ""
     
@@ -43,7 +48,7 @@ struct StockListView: View {
                 ForEach(self.listVM.stocks, id: \.ticker) { stock in
                     StockCellView(stock: stock)
                 }
-//                .onDelete(perform: removeItems)
+                //                .onDelete(perform: removeItems)
                 .onDelete{ indexSet in
                     let deleteItem = self.listVM.stocks[indexSet.first!]
                     Storageservice().removeWatchlistItem(deleteItem.ticker, self.listVM)
@@ -54,18 +59,12 @@ struct StockListView: View {
                 .font(.body)
                 .foregroundColor(.gray)
                 .frame(maxWidth: .infinity, alignment: .center)
-
+            
         }
         .listStyle(PlainListStyle()) //used to get rid of padding
         
-        
-        
-        
     }
-//
-//    func removeItems(at offsets: IndexSet) {
-//        listVM.stocks.remove(atOffsets: offsets)
-//    }
+
 }
 
 

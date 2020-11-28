@@ -13,7 +13,6 @@ struct SearchView: View {
     @ObservedObject var searchBar = SearchBar()
     
     var body: some View {
-        NavigationView {
             List {
                 ForEach(
                     planets.filter {
@@ -25,9 +24,9 @@ struct SearchView: View {
                     Text(eachPlanet)
                 }
             }
-            .navigationBarTitle("Stocks")
+            .listStyle(PlainListStyle()) //used to get rid of padding
             .add(self.searchBar)
-        }
+        
     }
 }
 
