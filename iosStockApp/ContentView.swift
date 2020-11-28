@@ -11,15 +11,16 @@ import SwiftUI
 
 struct ContentView: View {
     @ObservedObject private var stockListVM = StockListViewModel()
+    @ObservedObject private var searchBarVM = SearchBarViewModel()
+    @ObservedObject var searchBar = SearchBar()
     @State var isShowingList = true
     
-    var planets = ["Mercury", "Venus", "Earth", "Mars"]
-    @ObservedObject var searchBar = SearchBar()
-    
+    //    var planets = ["Mercury", "Venus", "Earth", "Mars"]
     let timer = Timer.publish(every: 15, on: .main, in: .common).autoconnect() //for refreshing stock prices
     
     init() {
         stockListVM.load()
+        searchBar.searchBarVM = self.searchBarVM
         print(stockListVM.stocks)
         print("init")
     }
@@ -30,13 +31,15 @@ struct ContentView: View {
                 //search part
                 List {
                     ForEach(
-                        planets.filter {
-                            searchBar.text.isEmpty ||
-                                $0.localizedStandardContains(searchBar.text)
-                        },
-                        id: \.self
-                    ) { eachPlanet in
-                        Text(eachPlanet)
+                        self.searchBarVM.suggestedStocks, id:\.ticker
+                    ) { eachSuggestion in
+                        VStack(alignment: .leading) {
+                            Text(eachSuggestion.ticker.uppercased())
+                                .bold()
+                            Text(eachSuggestion.name)
+                                .foregroundColor(.gray)
+                        }
+                        
                     }
                 }
                 .listStyle(PlainListStyle()) //used to get rid of padding

@@ -48,4 +48,26 @@ class Webservice {
         }
     }
     
+    func grabAutocompletes(_ keyword: String, _ searchVM: SearchBarViewModel) {
+        let url = "http://angularfinance-env.eba-m6bbnkf3.us-east-1.elasticbeanstalk.com/api/autocomplete/"+keyword //unique URL
+        print("grab autocomplete from API!")
+        var autocompleteItems = [SearchBarItem]()
+        if keyword.count>=3 {
+            AF.request(url).validate().responseData { (response) in
+                let autocompleteInfo = try! JSON(data: response.data!)
+//                print(test)
+//                print(autocompleteInfo)
+//                print(autocompleteInfo.count)
+                for (_, subJson): (String, JSON) in autocompleteInfo {
+//                    print(subJson["name"])
+                    let autocompleteResult = SearchBarItem(ticker: subJson["ticker"].stringValue, name: subJson["name"].stringValue)
+                    print(autocompleteResult)
+                    autocompleteItems.append(autocompleteResult)
+                }
+                searchVM.suggestedStocks = autocompleteItems
+            }
+        }
+        
+    }
+    
 }

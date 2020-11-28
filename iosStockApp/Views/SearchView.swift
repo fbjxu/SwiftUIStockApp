@@ -11,6 +11,7 @@ import SwiftUI
 struct SearchView: View {
     var planets = ["Mercury", "Venus", "Earth", "Mars"]
     @ObservedObject var searchBar = SearchBar()
+//    @ObservedObject var searchBarVM = SearchBarViewModel()
     
     var body: some View {
             List {
@@ -23,10 +24,14 @@ struct SearchView: View {
                 ) { eachPlanet in
                     Text(eachPlanet)
                 }
+//                ForEach(
+//                    searchBarVM.suggestedStocks, id:\.ticker
+//                ) { eachSuggestion in
+//                    Text(eachSuggestion.name)
+//                }
             }
-            .listStyle(PlainListStyle()) //used to get rid of padding
-            .add(self.searchBar)
-        
+            .add(SearchBar())
+           
     }
 }
 

@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5B65B6852572D37300632B30 /* SearchBarViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B65B6842572D37300632B30 /* SearchBarViewModel.swift */; };
+		5B65B6882572D3DA00632B30 /* SearchBarItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B65B6872572D3DA00632B30 /* SearchBarItem.swift */; };
 		5B7FAF81256D9D5B0092E98F /* iosStockAppApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B7FAF80256D9D5B0092E98F /* iosStockAppApp.swift */; };
 		5B7FAF83256D9D5B0092E98F /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B7FAF82256D9D5B0092E98F /* ContentView.swift */; };
 		5B7FAF85256D9D5D0092E98F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5B7FAF84256D9D5D0092E98F /* Assets.xcassets */; };
@@ -25,6 +27,8 @@
 
 /* Begin PBXFileReference section */
 		0B1680039BF87805EC5F6105 /* Pods-iosStockApp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-iosStockApp.release.xcconfig"; path = "Target Support Files/Pods-iosStockApp/Pods-iosStockApp.release.xcconfig"; sourceTree = "<group>"; };
+		5B65B6842572D37300632B30 /* SearchBarViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchBarViewModel.swift; sourceTree = "<group>"; };
+		5B65B6872572D3DA00632B30 /* SearchBarItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchBarItem.swift; sourceTree = "<group>"; };
 		5B7FAF7D256D9D5B0092E98F /* iosStockApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iosStockApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5B7FAF80256D9D5B0092E98F /* iosStockAppApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iosStockAppApp.swift; sourceTree = "<group>"; };
 		5B7FAF82256D9D5B0092E98F /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -123,6 +127,7 @@
 			children = (
 				5BA6065A256F15D800C8FF41 /* StockViewModel.swift */,
 				5BA6065D256F15E400C8FF41 /* StockListViewModel.swift */,
+				5B65B6842572D37300632B30 /* SearchBarViewModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -131,6 +136,7 @@
 			isa = PBXGroup;
 			children = (
 				5B83062D256D9FAE00AD98BE /* Stock.swift */,
+				5B65B6872572D3DA00632B30 /* SearchBarItem.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -270,11 +276,13 @@
 				5BA6065E256F15E400C8FF41 /* StockListViewModel.swift in Sources */,
 				5B7FAF81256D9D5B0092E98F /* iosStockAppApp.swift in Sources */,
 				5B83062E256D9FAE00AD98BE /* Stock.swift in Sources */,
+				5B65B6882572D3DA00632B30 /* SearchBarItem.swift in Sources */,
 				5BA6065B256F15D800C8FF41 /* StockViewModel.swift in Sources */,
 				5BB8322825718C8700DFE1EC /* ViewControllerResolver.swift in Sources */,
 				5BA6066225701B4500C8FF41 /* Storageservice.swift in Sources */,
 				5B83062A256D9EF300AD98BE /* Webservice.swift in Sources */,
 				5BA60658256F159800C8FF41 /* StockListView.swift in Sources */,
+				5B65B6852572D37300632B30 /* SearchBarViewModel.swift in Sources */,
 				5BB8322B25718E3200DFE1EC /* SearchView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

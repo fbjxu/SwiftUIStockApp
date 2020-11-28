@@ -10,6 +10,7 @@ import SwiftUI
 class SearchBar: NSObject, ObservableObject {
     
     @Published var text: String = ""
+    var searchBarVM = SearchBarViewModel()
     let searchController: UISearchController = UISearchController(searchResultsController: nil)
     
     override init() {
@@ -26,6 +27,7 @@ extension SearchBar: UISearchResultsUpdating {
         // Publish search bar text changes.
         if let searchBarText = searchController.searchBar.text {
             self.text = searchBarText
+            self.searchBarVM.refreshList(self.text)
         }
     }
 }
