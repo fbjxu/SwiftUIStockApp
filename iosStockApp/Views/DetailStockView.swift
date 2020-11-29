@@ -162,32 +162,54 @@ struct DetailStockView: View {
                 }
             }
             //News
-            VStack {
-                HStack {
-                    Text("About")
-                        .font(.title)
-                        .padding(.vertical, 8)
-                    Spacer()
-                }
-                
-                KFImage(URL(string: "https://i.insider.com/5f9c2b106f5b3100117246dc?width=1200&format=jpeg")!)
-                    .resizable()
-                    .scaledToFit()
-                    .cornerRadius(15)
-                
-                HStack {
-                    Text("Business Insider")
+            Button(action: {
+                UIApplication.shared.open(URL(string: "https://www.google.com")!)
+            }) {
+                VStack {
+                    HStack {
+                        Text("News")
+                            .font(.title)
+                            .padding(.vertical, 8)
+                            .foregroundColor(.black)
+                        Spacer()
+                    }
+                    
+                    KFImage(URL(string: "https://i.insider.com/5f9c2b106f5b3100117246dc?width=1200&format=jpeg")!)
+                        .resizable()
+                        .scaledToFit()
+                        .cornerRadius(15)
+                    
+                    HStack {
+                        Text("Business Insider")
+                            .bold()
+                            .foregroundColor(.gray)
+                        Text("6 Days Ago")
+                            .foregroundColor(.gray)
+                        Spacer()
+                    }
+                    Text("Here is some title that will show up so people can read haha")
                         .bold()
-                        .foregroundColor(.gray)
-                    Text("6 Days Ago")
-                        .foregroundColor(.gray)
-                    Spacer()
+                        .font(.title2)
+                        .foregroundColor(.black)
                 }
-                Text("Here is some title that will show up so people can read haha")
-                    .bold()
-                    .font(.title2)
+                .padding(.horizontal, 10)
             }
-            .padding(.horizontal, 10)
+            .contextMenu {
+                Button(action: {
+                // Action will goes here
+                }) {
+                    Label("Open in Safari", systemImage: "safari")
+             
+                }
+                
+                Button(action: {
+                // Action will goes here
+                }) {
+                    
+                    Label("Share on Twitter", systemImage: "square.and.arrow.up")
+                }
+            }
+            
             
             Divider()
             
@@ -216,6 +238,7 @@ struct DetailStockView: View {
                     .frame(width: 90, height: 90)
                     .clipped()
                     .cornerRadius(10)
+                    
             }
             .padding(.horizontal, 10)
             

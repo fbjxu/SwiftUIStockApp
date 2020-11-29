@@ -9,11 +9,13 @@ import Foundation
 
 class DetailViewModel: ObservableObject {
     @Published public var stockPriceSummaryInfo: PriceSummaryItem = PriceSummaryItem(ticker: "", last: 0, change: 0, low: 0, bidPrice: 0, open: 0, mid: 0)
+    @Published public var stockNews: [NewsItem] = [NewsItem]()
     @Published public var stockAboutInfo: String = ""
     
     func getPriceSummary(_ ticker: String) {
         Webservice().getStockPriceSummary(ticker, self)
         Webservice().getAbout(ticker, self)
+        Webservice().getNews(ticker, self)
     }
     
     func getAbout(_ ticker: String) -> String {

@@ -31,6 +31,7 @@ class Webservice {
     
     }
     
+    //getAbout: given a ticker, get the company summary
     func getAbout(_ ticker: String, _ detailVM: DetailViewModel) {
         let url = "http://angularfinance-env.eba-m6bbnkf3.us-east-1.elasticbeanstalk.com/api/summary/"+ticker //unique URL
         AF.request(url).validate().responseData{ (response) in
@@ -38,6 +39,30 @@ class Webservice {
             detailVM.stockAboutInfo = aboutInfo["description"].stringValue 
         }
     }
+    
+    //getNews: given a ticker, get the ticker's list of NewsItems
+    func getNews(_ ticker: String, _ detailVM: DetailViewModel) {
+        let url = "http://angularfinance-env.eba-m6bbnkf3.us-east-1.elasticbeanstalk.com/api/news/"+ticker //unique URL
+        AF.request(url).validate().responseData{ (response) in
+            
+            let newsInfo = try! JSON(data: response.data!) //converting response JSON to the swifty JSON struct
+            print(newsInfo.count)
+            for (_, subJson): (String, JSON) in newsInfo {
+                print(subJson)
+            }
+            
+//            let news =
+//                PriceSummaryItem(ticker: ticker,
+//                                    last: stockPriceInfo[0]["last"].doubleValue,
+//                                    change: stockPriceInfo[0]["prevClose"].doubleValue - stockPriceInfo[0]["last"].doubleValue,
+//                                    low: stockPriceInfo[0]["low"].doubleValue,
+//                                    bidPrice: stockPriceInfo[0]["bidPrice"].doubleValue,
+//                                    open: stockPriceInfo[0]["open"].doubleValue,
+//                                    mid: stockPriceInfo[0]["mid"].doubleValue)
+//            detailVM.stockPriceSummaryInfo = stock
+        }
+    }
+    
     //addTickerAPI adds the input ticker to the passed in StockListVM and update its price via REST
     func addTickerAPI(_ ticker: String, _ stockListVM: StockListViewModel, _ portfolioOption: Bool = false, _ numShares: Double = 0) {
         let url = "http://angularfinance-env.eba-m6bbnkf3.us-east-1.elasticbeanstalk.com/api/pricesummary/"+ticker //unique URL
