@@ -33,12 +33,15 @@ struct ContentView: View {
                     ForEach(
                         self.searchBarVM.suggestedStocks, id:\.ticker
                     ) { eachSuggestion in
-                        VStack(alignment: .leading) {
-                            Text(eachSuggestion.ticker.uppercased())
-                                .bold()
-                            Text(eachSuggestion.name)
-                                .foregroundColor(.gray)
+                        NavigationLink(destination: DetailStockView(eachSuggestion.ticker.uppercased(), eachSuggestion.name)) {
+                            VStack(alignment: .leading) {
+                                Text(eachSuggestion.ticker.uppercased())
+                                    .bold()
+                                Text(eachSuggestion.name)
+                                    .foregroundColor(.gray)
+                            }
                         }
+                        
                         
                     }
                 }
@@ -54,9 +57,6 @@ struct ContentView: View {
                             stockListVM.refresh()
                         }
                 }
-                
-                
-                
                 
             }
             

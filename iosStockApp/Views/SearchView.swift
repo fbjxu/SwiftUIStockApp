@@ -11,7 +11,6 @@ import SwiftUI
 struct SearchView: View {
     var planets = ["Mercury", "Venus", "Earth", "Mars"]
     @ObservedObject var searchBar = SearchBar()
-//    @ObservedObject var searchBarVM = SearchBarViewModel()
     
     var body: some View {
             List {
@@ -24,13 +23,9 @@ struct SearchView: View {
                 ) { eachPlanet in
                     Text(eachPlanet)
                 }
-//                ForEach(
-//                    searchBarVM.suggestedStocks, id:\.ticker
-//                ) { eachSuggestion in
-//                    Text(eachSuggestion.name)
-//                }
+
             }
-            .add(SearchBar())
+            .add(self.searchBar)
            
     }
 }
