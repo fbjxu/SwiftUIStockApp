@@ -46,20 +46,20 @@ class Webservice {
         AF.request(url).validate().responseData{ (response) in
             
             let newsInfo = try! JSON(data: response.data!) //converting response JSON to the swifty JSON struct
-            print(newsInfo.count)
+//            print(newsInfo.count)
+            var updatedNews = [NewsItem]()
+            var i: Int = 1
             for (_, subJson): (String, JSON) in newsInfo {
-                print(subJson)
+//                print(subJson)
+//                print("title:", subJson["title"])
+//                print("source: ", subJson["source"]["name"])
+//                print("time: ", subJson["publishedAt"])
+                let newsPiece = NewsItem(id: i, source: subJson["source"]["name"].stringValue, title: subJson["title"].stringValue, url: subJson["URL"].stringValue, urlToImage: subJson["urlToImage"].stringValue, publishedAt: subJson["publishedAt"].stringValue)
+                updatedNews.append(newsPiece)
+                i += 1
+   
             }
-            
-//            let news =
-//                PriceSummaryItem(ticker: ticker,
-//                                    last: stockPriceInfo[0]["last"].doubleValue,
-//                                    change: stockPriceInfo[0]["prevClose"].doubleValue - stockPriceInfo[0]["last"].doubleValue,
-//                                    low: stockPriceInfo[0]["low"].doubleValue,
-//                                    bidPrice: stockPriceInfo[0]["bidPrice"].doubleValue,
-//                                    open: stockPriceInfo[0]["open"].doubleValue,
-//                                    mid: stockPriceInfo[0]["mid"].doubleValue)
-//            detailVM.stockPriceSummaryInfo = stock
+            detailVM.stockNews = updatedNews
         }
     }
     

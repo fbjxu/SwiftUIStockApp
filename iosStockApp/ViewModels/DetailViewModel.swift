@@ -18,6 +18,7 @@ class DetailViewModel: ObservableObject {
         Webservice().getNews(ticker, self)
     }
     
+    
     func getAbout(_ ticker: String) -> String {
         return self.stockAboutInfo
     }
