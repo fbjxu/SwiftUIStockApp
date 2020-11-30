@@ -36,15 +36,19 @@ class Webservice {
         let url = "http://angularfinance-env.eba-m6bbnkf3.us-east-1.elasticbeanstalk.com/api/summary/"+ticker //unique URL
         AF.request(url).validate().responseData{ (response) in
             let aboutInfo = try! JSON(data: response.data!) //converting response JSON to the swifty JSON struct
-            detailVM.stockAboutInfo = aboutInfo["description"].stringValue 
+            detailVM.stockAboutInfo = aboutInfo["description"].stringValue.replacingOccurrences(of: "\"", with: " ").trimmingCharacters(in: .whitespacesAndNewlines)
         }
     }
     
     //getNews: given a ticker, get the ticker's list of NewsItems
     func getNews(_ ticker: String, _ detailVM: DetailViewModel) {
+        print("called get news")
+        return
         let url = "http://angularfinance-env.eba-m6bbnkf3.us-east-1.elasticbeanstalk.com/api/news/"+ticker //unique URL
         AF.request(url).validate().responseData{ (response) in
-            
+            if(response.data == nil) {
+                return
+            }
             let newsInfo = try! JSON(data: response.data!) //converting response JSON to the swifty JSON struct
 //            print(newsInfo.count)
             var updatedNews = [NewsItem]()
@@ -54,7 +58,7 @@ class Webservice {
 //                print("title:", subJson["title"])
 //                print("source: ", subJson["source"]["name"])
 //                print("time: ", subJson["publishedAt"])
-                let newsPiece = NewsItem(id: i, source: subJson["source"]["name"].stringValue, title: subJson["title"].stringValue, url: subJson["URL"].stringValue, urlToImage: subJson["urlToImage"].stringValue, publishedAt: subJson["publishedAt"].stringValue)
+                let newsPiece = NewsItem(id: i, source: subJson["source"]["name"].stringValue, title: subJson["title"].stringValue, url: subJson["url"].stringValue, urlToImage: subJson["urlToImage"].stringValue, publishedAt: subJson["publishedAt"].stringValue)
                 updatedNews.append(newsPiece)
                 i += 1
    
@@ -93,9 +97,14 @@ class Webservice {
             print("refreshed!")
             AF.request(url).validate().responseData { (response) in
                 let stockPriceInfo = try! JSON(data: response.data!)
-                print(stockPriceInfo)
-                stockListVM.stocks[index].stock.price = stockPriceInfo[0]["last"].doubleValue
-                stockListVM.stocks[index].stock.change = stockPriceInfo[0]["prevClose"].doubleValue - stockPriceInfo[0]["last"].doubleValue
+                print("updated price for \(stockListVM.stocks[index].ticker) \(stockPriceInfo[0]["last"].doubleValue)")
+                let newStock = stockListVM.stocks[index].stock
+                newStock.price = stockPriceInfo[0]["last"].doubleValue
+                newStock.change = stockPriceInfo[0]["prevClose"].doubleValue - stockPriceInfo[0]["last"].doubleValue
+                stockListVM.stocks[index].stock = newStock
+//                stockListVM.stocks[index].stock.price = stockPriceInfo[0]["last"].doubleValue
+//                stockListVM.stocks[index].stock.change = stockPriceInfo[0]["prevClose"].doubleValue - stockPriceInfo[0]["last"].doubleValue
+                print("after update for \(newStock.ticker) \( newStock.price)")
             }
         }
     }

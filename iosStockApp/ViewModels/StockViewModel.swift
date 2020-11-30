@@ -8,7 +8,7 @@
 import Foundation
 
 struct StockViewModel {
-    let stock: Stock
+    var stock: Stock
     
     var ticker: String {
         return self.stock.ticker.uppercased()

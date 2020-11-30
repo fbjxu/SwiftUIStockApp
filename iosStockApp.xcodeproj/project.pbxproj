@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5B2D7881257408D10018BEE6 /* NewsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B2D7880257408D10018BEE6 /* NewsView.swift */; };
+		5B2D7884257427070018BEE6 /* ChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B2D7883257427070018BEE6 /* ChartView.swift */; };
 		5B65B6852572D37300632B30 /* SearchBarViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B65B6842572D37300632B30 /* SearchBarViewModel.swift */; };
 		5B65B6882572D3DA00632B30 /* SearchBarItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B65B6872572D3DA00632B30 /* SearchBarItem.swift */; };
 		5B65B68C257310E000632B30 /* DetailStockView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B65B68B257310E000632B30 /* DetailStockView.swift */; };
@@ -32,6 +34,8 @@
 
 /* Begin PBXFileReference section */
 		0B1680039BF87805EC5F6105 /* Pods-iosStockApp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-iosStockApp.release.xcconfig"; path = "Target Support Files/Pods-iosStockApp/Pods-iosStockApp.release.xcconfig"; sourceTree = "<group>"; };
+		5B2D7880257408D10018BEE6 /* NewsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsView.swift; sourceTree = "<group>"; };
+		5B2D7883257427070018BEE6 /* ChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartView.swift; sourceTree = "<group>"; };
 		5B65B6842572D37300632B30 /* SearchBarViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchBarViewModel.swift; sourceTree = "<group>"; };
 		5B65B6872572D3DA00632B30 /* SearchBarItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchBarItem.swift; sourceTree = "<group>"; };
 		5B65B68B257310E000632B30 /* DetailStockView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailStockView.swift; sourceTree = "<group>"; };
@@ -129,6 +133,8 @@
 				5BB8322725718C8700DFE1EC /* ViewControllerResolver.swift */,
 				5BB8322A25718E3200DFE1EC /* SearchView.swift */,
 				5B65B68B257310E000632B30 /* DetailStockView.swift */,
+				5B2D7880257408D10018BEE6 /* NewsView.swift */,
+				5B2D7883257427070018BEE6 /* ChartView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -294,12 +300,14 @@
 				5B65B68F25731E6D00632B30 /* PriceSummaryItem.swift in Sources */,
 				5B7FAF83256D9D5B0092E98F /* ContentView.swift in Sources */,
 				5BB832242571889A00DFE1EC /* SearchBar.swift in Sources */,
+				5B2D7881257408D10018BEE6 /* NewsView.swift in Sources */,
 				5BA6065E256F15E400C8FF41 /* StockListViewModel.swift in Sources */,
 				5B7FAF81256D9D5B0092E98F /* iosStockAppApp.swift in Sources */,
 				5B65B68C257310E000632B30 /* DetailStockView.swift in Sources */,
 				5B83062E256D9FAE00AD98BE /* Stock.swift in Sources */,
 				5B65B6882572D3DA00632B30 /* SearchBarItem.swift in Sources */,
 				5BA6065B256F15D800C8FF41 /* StockViewModel.swift in Sources */,
+				5B2D7884257427070018BEE6 /* ChartView.swift in Sources */,
 				5BB8322825718C8700DFE1EC /* ViewControllerResolver.swift in Sources */,
 				5BA6066225701B4500C8FF41 /* Storageservice.swift in Sources */,
 				5B65B69D2573716600632B30 /* NewsItem.swift in Sources */,

@@ -13,57 +13,137 @@ struct StockListView: View {
     
     //    let stocks: [StockViewModel]
     @ObservedObject var listVM: StockListViewModel
-    
-//    var planets = ["Mercury", "Venus", "Earth", "Mars"]
-//    @ObservedObject var searchBar = SearchBar()
-    
-    
-    //used for input field
+    @ObservedObject var searchBar: SearchBar
+    @ObservedObject private var searchBarVM: SearchBarViewModel
     @State private var newStock = ""
     
+    let timer = Timer.publish(every: 15, on: .main, in: .common).autoconnect() //for refreshing stock prices
+    
+    
+    
+    init() {
+        self.listVM = StockListViewModel()
+        self.searchBar = SearchBar()
+        self.searchBarVM = SearchBarViewModel()
+        self.listVM.load()
+        self.searchBar.searchBarVM = searchBarVM
+    }
+    
     var body: some View {
-        List {
-            Section(header: Text("Input Stock")) {
-                HStack{
-                    TextField("New Item", text: self.$newStock)
-                    Button(action: {
-                        //update StockListVM
-                        Storageservice().addWatchlistItem(self.newStock, self.listVM)
-                        //reset input
-                        self.newStock=""
-                    }) {
-                        Image(systemName: "plus.circle.fill")
-                            .foregroundColor(.green)
-                            .imageScale(.large)
+        NavigationView{
+            List {
+                //search
+                ForEach(
+                    self.searchBarVM.suggestedStocks, id:\.ticker
+                ) { eachSuggestion in
+                    NavigationLink(destination: NavigationLazyView(DetailStockView(eachSuggestion.ticker.uppercased(), eachSuggestion.name))) {
+                        VStack(alignment: .leading) {
+                            Text(eachSuggestion.ticker.uppercased())
+                                .bold()
+                            Text(eachSuggestion.name)
+                                .foregroundColor(.gray)
+                        }
                     }
                 }
-            }
-            Section(header: Text("PORTFOLIO")) {
-                ForEach(self.listVM.portfolioItems, id: \.ticker) { stock in
-                    PortfolioCellView(stock: stock)
+                
+                //stock
+                if(self.searchBar.text.isEmpty) {
+                    Section(header: Text("Input Stock")) {
+                        HStack{
+                            TextField("New Item", text: self.$newStock)
+                            Button(action: {
+                                //update StockListVM
+                                Storageservice().addWatchlistItem(self.newStock, self.listVM)
+                                //reset input
+                                self.newStock=""
+                            }) {
+                                Image(systemName: "plus.circle.fill")
+                                    .foregroundColor(.green)
+                                    .imageScale(.large)
+                            }
+                        }
+                    }
+                    Section(header: Text("PORTFOLIO")) {
+                        ForEach(self.listVM.portfolioItems, id: \.ticker) { stock in
+                            HStack {
+                                
+                                VStack(alignment: .leading) {
+                                    Text(stock.ticker)
+                                        .font(.custom("Arial",size: 22))
+                                        .fontWeight(.bold)
+                                        .padding(EdgeInsets(top: 0, leading: 0, bottom: 5, trailing: 0))
+                                    
+                                    Text(stock.numShares)
+                                        .padding(5)
+                                        .foregroundColor(.gray)
+                                    
+                                }
+                                
+                                Spacer()
+                                
+                                VStack {
+                                    Text("\(stock.price)")
+                                        .font(.custom("Arial",size: 22))
+                                    
+                                    Text(stock.change)
+                                        .padding(5)
+                                        .foregroundColor(Color.green)
+                                }
+                                
+                            }
+                        }
+                    }
+                    
+                    Section(header: Text("FAVORITES")) {
+                        
+                        ForEach(self.listVM.stocks, id: \.ticker) { stock in
+//                            StockCellView(stock:stock)
+                            HStack {
+
+                                VStack(alignment: .leading) {
+                                    Text(stock.ticker)
+                                        .font(.custom("Arial",size: 22))
+                                        .fontWeight(.bold)
+                                        .padding(EdgeInsets(top: 0, leading: 0, bottom: 5, trailing: 0))
+
+                                }
+
+                                Spacer()
+
+                                VStack {
+                                    Text("\(stock.price)")
+                                        .font(.custom("Arial",size: 22))
+
+                                    Text("\(stock.change)")
+                                        .padding(5)
+                                        .foregroundColor(Color.green)
+                                }
+
+                            }
+                        }
+                        .onDelete{ indexSet in
+                            let deleteItem = self.listVM.stocks[indexSet.first!]
+                            Storageservice().removeWatchlistItem(deleteItem.ticker, self.listVM)
+                            listVM.stocks.remove(atOffsets: indexSet)
+                        }
+                    }
+                    Link("Powered by Tiingo", destination: URL(string: "https://www.tiingo.com")!)
+                        .font(.body)
+                        .foregroundColor(.gray)
+                        .frame(maxWidth: .infinity, alignment: .center)
                 }
+                
+                
             }
-            
-            Section(header: Text("FAVORITES")) {
-                ForEach(self.listVM.stocks, id: \.ticker) { stock in
-                    StockCellView(stock: stock)
-                }
-                //                .onDelete(perform: removeItems)
-                .onDelete{ indexSet in
-                    let deleteItem = self.listVM.stocks[indexSet.first!]
-                    Storageservice().removeWatchlistItem(deleteItem.ticker, self.listVM)
-                    listVM.stocks.remove(atOffsets: indexSet)
-                }
-            }
-            Link("Powered by Tiingo", destination: URL(string: "https://www.tiingo.com")!)
-                .font(.body)
-                .foregroundColor(.gray)
-                .frame(maxWidth: .infinity, alignment: .center)
-            
+            .add(self.searchBar)
+            .listStyle(PlainListStyle()) //used to get rid of padding
+            .navigationTitle("Stock")
         }
-        .listStyle(PlainListStyle()) //used to get rid of padding
-        
+        .onReceive(timer) { input in
+            Webservice().refreshPriceSummary(self.listVM)
+        }
     }
+    
 
 }
 
@@ -71,7 +151,7 @@ struct StockListView: View {
 
 struct StockCellView: View {
     
-    let stock: StockViewModel
+    var stock: StockViewModel
     
     var body: some View {
         
@@ -104,7 +184,7 @@ struct StockCellView: View {
 
 struct PortfolioCellView: View {
     
-    let stock: StockViewModel
+    @State var stock: StockViewModel
     
     var body: some View {
         
@@ -147,7 +227,7 @@ struct StockListView_Previews: PreviewProvider {
         
         let previewListVM = StockListViewModel()
         previewListVM.load()
-        return StockListView(listVM: previewListVM)
+        return StockListView()
     }
 }
 
