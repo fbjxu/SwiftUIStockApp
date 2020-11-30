@@ -18,8 +18,7 @@ struct StockListView: View {
     @State private var newStock = ""
     
     let timer = Timer.publish(every: 15, on: .main, in: .common).autoconnect() //for refreshing stock prices
-    
-    
+
     
     init() {
         self.listVM = StockListViewModel()
@@ -138,6 +137,7 @@ struct StockListView: View {
             .add(self.searchBar)
             .listStyle(PlainListStyle()) //used to get rid of padding
             .navigationTitle("Stock")
+            .navigationBarItems(trailing: EditButton())
         }
         .onReceive(timer) { input in
             Webservice().refreshPriceSummary(self.listVM)

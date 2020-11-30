@@ -9,9 +9,11 @@ import Foundation
 import SwiftUI
 import KingfisherSwiftUI
 
+
+
 struct DetailStockView: View {
     @ObservedObject var detailVM =  DetailViewModel()
-    
+    @State private var showingTradeSheet = false
     
     var stockTicker: String = ""
     var stockName: String = ""
@@ -67,7 +69,52 @@ struct DetailStockView: View {
                     Spacer()
                 }
                 
+                //portfolio
                 
+                VStack (alignment: .leading) {
+                    
+                    HStack{
+                        
+                        VStack (alignment:.leading, spacing: 0) {
+                            Text("Portfolio")
+                                .font(.title)
+                                .padding(.vertical, 8)
+                            
+
+                            
+                        }
+                        Spacer()
+                            
+                    }
+                    HStack {
+                        VStack(alignment: .leading){
+                            Text("You have 0 shares of \(self.stockTicker)")
+                            Text("Start trading!")
+                        }
+                        Spacer()
+                            
+                        Button(action: {
+                            self.showingTradeSheet.toggle()
+                        }) {
+                            ZStack {
+                                RoundedRectangle(cornerRadius: 25)
+                                    .frame(width: 130, height: 50, alignment: .center)
+                                    .foregroundColor(.green)
+                                Text("Trade")
+                                    .bold()
+                                    .foregroundColor(.white)
+                            }
+                        }
+                        .sheet(isPresented: $showingTradeSheet) {
+                            TradeView()
+                        }
+                        
+                    }
+                    
+                    .padding(.vertical,  10)
+                }
+                
+
                 //stats
                 VStack (alignment: .leading) {
                     

@@ -120,7 +120,7 @@ struct NewsView: View {
                     
                     Button(action: {
                     // Action will goes here
-                        UIApplication.shared.open(URL(string: "https://twitter.com/intent/tweet?text=Check out this link: \(newsItem.url) #CSCI571StockApp")!)
+                        UIApplication.shared.open(URL(string: "https://twitter.com/intent/tweet?text=Check%20out%20this%20link:%20\(newsItem.url)%20%23CSCI571StockApp")!)
                     }) {
                         
                         Label("Share on Twitter", systemImage: "square.and.arrow.up")
