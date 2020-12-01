@@ -35,7 +35,7 @@ struct StockListView: View {
                 ForEach(
                     self.searchBarVM.suggestedStocks, id:\.ticker
                 ) { eachSuggestion in
-                    NavigationLink(destination: NavigationLazyView(DetailStockView(eachSuggestion.ticker.uppercased(), eachSuggestion.name))) {
+                    NavigationLink(destination: NavigationLazyView(DetailStockView(eachSuggestion.ticker.uppercased(), eachSuggestion.name, self.listVM))) {
                         VStack(alignment: .leading) {
                             Text(eachSuggestion.ticker.uppercased())
                                 .bold()
@@ -140,7 +140,11 @@ struct StockListView: View {
             .navigationBarItems(trailing: EditButton())
         }
         .onReceive(timer) { input in
+            print("activate timer")
             Webservice().refreshPriceSummary(self.listVM)
+        }
+        .onDisappear {
+            print("stop timer")
         }
     }
     

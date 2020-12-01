@@ -67,6 +67,8 @@ class Webservice {
         }
     }
     
+    
+    
     //addTickerAPI adds the input ticker to the passed in StockListVM and update its price via REST
     func addTickerAPI(_ ticker: String, _ stockListVM: StockListViewModel, _ portfolioOption: Bool = false, _ numShares: Double = 0) {
         let url = "http://angularfinance-env.eba-m6bbnkf3.us-east-1.elasticbeanstalk.com/api/pricesummary/"+ticker //unique URL
@@ -90,6 +92,49 @@ class Webservice {
         }
     }
     
+    //updateTickerAPI: given a input ticker that already exists in the local storage, update its price
+    func updateTickerAPI(_ ticker: String, _ stockListVM: StockListViewModel, _ portfolioOption: Bool = false, _ numShares: Double = 0) {
+        let url = "http://angularfinance-env.eba-m6bbnkf3.us-east-1.elasticbeanstalk.com/api/pricesummary/"+ticker //unique URL
+        AF.request(url).validate().responseData{ (response) in
+            
+            let stockPriceInfo = try! JSON(data: response.data!) //converting response JSON to the swifty JSON struct
+            
+            //portfolio Case
+            if portfolioOption {
+                for (index,stockVM) in stockListVM.portfolioItems.enumerated() {
+                    if(stockVM.ticker == ticker) {
+                        let newstock = stockListVM.portfolioItems[index].stock //get current stock from stockListVM
+                        newstock.price = stockPriceInfo[0]["last"].doubleValue
+                        newstock.change = stockPriceInfo[0]["prevClose"].doubleValue - stockPriceInfo[0]["last"].doubleValue
+                        newstock.numShares += numShares
+                        if(newstock.numShares == 0) {
+                            stockListVM.portfolioItems.remove(at:index)
+                            print("updateTickerPrice for portfolio: removed emptied positions")
+                            return
+                        }
+                        stockListVM.portfolioItems[index].stock = newstock
+                        print("updateTickerPrice for portfolio")
+                        return
+                    }
+                }
+            } else {
+                //Watchlist Case
+                for (index,stockVM) in stockListVM.stocks.enumerated() {
+                    if(stockVM.ticker == ticker) {
+                        let newstock = stockListVM.portfolioItems[index].stock //get current stock from stockListVM
+                        newstock.price = stockPriceInfo[0]["last"].doubleValue
+                        newstock.change = stockPriceInfo[0]["prevClose"].doubleValue - stockPriceInfo[0]["last"].doubleValue
+                        newstock.numShares = numShares
+                        stockListVM.portfolioItems[index].stock = newstock
+                        print("updateTickerPrice for watchlist")
+                        return
+                    }
+                }
+                
+            }
+        }
+    }
+    
     func refreshPriceSummary(_ stockListVM: StockListViewModel) {
         for index in 0..<stockListVM.stocks.count {//iterate all stockViewModel within StockListVM
             let ticker = stockListVM.stocks[index].stock.ticker
@@ -106,6 +151,46 @@ class Webservice {
 //                stockListVM.stocks[index].stock.change = stockPriceInfo[0]["prevClose"].doubleValue - stockPriceInfo[0]["last"].doubleValue
                 print("after update for \(newStock.ticker) \( newStock.price)")
             }
+        }
+        
+        for index in 0..<stockListVM.portfolioItems.count {//iterate all stockViewModel within StockListVM
+            let ticker = stockListVM.portfolioItems[index].stock.ticker
+            let url = "http://angularfinance-env.eba-m6bbnkf3.us-east-1.elasticbeanstalk.com/api/pricesummary/"+ticker //unique URL
+            print("refreshed!")
+            AF.request(url).validate().responseData { (response) in
+                let stockPriceInfo = try! JSON(data: response.data!)
+                print("updated price for \(stockListVM.portfolioItems[index].ticker) \(stockPriceInfo[0]["last"].doubleValue)")
+                let newStock = stockListVM.portfolioItems[index].stock
+                newStock.price = stockPriceInfo[0]["last"].doubleValue
+                newStock.change = stockPriceInfo[0]["prevClose"].doubleValue - stockPriceInfo[0]["last"].doubleValue
+                stockListVM.portfolioItems[index].stock = newStock
+
+                print("after update for \(stockListVM.portfolioItems[index].stock.ticker) \( stockListVM.portfolioItems[index].stock.price)")
+            }
+        }
+    }
+    
+    //given a detailVM, update the stockPriceSummaryItem contained in the detailVM
+    func refreshSinglePriceSummary(_ detailVM: DetailViewModel) {
+        let ticker = detailVM.stockPriceSummaryInfo.ticker
+        let url = "http://angularfinance-env.eba-m6bbnkf3.us-east-1.elasticbeanstalk.com/api/pricesummary/"+ticker //unique URL
+        print("refreshed single price summary for detail page!")
+        
+        AF.request(url).validate().responseData { (response) in
+            let stockPriceInfo = try! JSON(data: response.data!)
+            print("updated price for \(detailVM.stockPriceSummaryInfo.ticker) \(stockPriceInfo[0]["last"].doubleValue)")
+            //create new stockPriceSummaryItem
+            var newStockPriceSummaryInfo = detailVM.stockPriceSummaryInfo
+            newStockPriceSummaryInfo.last = stockPriceInfo[0]["last"].doubleValue
+            newStockPriceSummaryInfo.change = stockPriceInfo[0]["prevClose"].doubleValue - stockPriceInfo[0]["last"].doubleValue
+            newStockPriceSummaryInfo.low = stockPriceInfo[0]["low"].doubleValue
+            newStockPriceSummaryInfo.bidPrice = stockPriceInfo[0]["bidPrice"].doubleValue
+            newStockPriceSummaryInfo.open = stockPriceInfo[0]["open"].doubleValue
+            newStockPriceSummaryInfo.mid = stockPriceInfo[0]["mid"].doubleValue
+            //update the referenced detailVM
+            detailVM.stockPriceSummaryInfo = newStockPriceSummaryInfo
+
+            print("after update for \(detailVM.stockPriceSummaryInfo.ticker) \( detailVM.stockPriceSummaryInfo.last)")
         }
     }
     

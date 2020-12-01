@@ -9,11 +9,11 @@ import Foundation
 
 struct PriceSummaryItem {
     let ticker: String
-    let last: Double //price
-    let change: Double 
-    let low:Double
-    let bidPrice: Double
-    let open: Double
-    let mid: Double
+    var last: Double //price
+    var change: Double
+    var low:Double
+    var bidPrice: Double
+    var open: Double
+    var mid: Double
     
 }

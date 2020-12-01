@@ -89,8 +89,65 @@ class Storageservice {
         }
     }
     
-    func updatePortfolioItem(_ ticker: String, _ numShares: Double) {
-       
+    func buyStock(_ inputTicker: String, _ numShares: Double,  _ listVM: StockListViewModel) {
+        var oldPortfolioList = self.getPortfolio()
+        //if the list contains the ticker
+        for(index, element) in oldPortfolioList.enumerated() {
+            if (element.ticker == inputTicker) {
+                //found in the list -> update item num Shares
+                var updatePortfolioEntry = oldPortfolioList[index]
+                updatePortfolioEntry.numShares += numShares
+                oldPortfolioList[index] = updatePortfolioEntry
+                self.portfolioList = oldPortfolioList
+                
+                if let encoded = try? JSONEncoder().encode(oldPortfolioList) {
+                    Webservice().updateTickerAPI(inputTicker, listVM, true, numShares) //update the list and ask for the latest stock price
+                    UserDefaults.standard.set(encoded, forKey: "portfolioItems") //update local storage
+                    print("buyStock ", String(data: encoded, encoding: .utf8)!) //debug
+                }
+                return
+            }
+        }
+        //did not found in the list -> append a new portfolioItem
+        oldPortfolioList.append(PortfolioItem(ticker:inputTicker, numShares: numShares))
+        self.portfolioList = oldPortfolioList
+        if let encoded = try? JSONEncoder().encode(oldPortfolioList) {
+            Webservice().updateTickerAPI(inputTicker, listVM, true, numShares) //add this new ticker and ask for the latest stock price
+            UserDefaults.standard.set(encoded, forKey: "portfolioItems") //update local storage
+            print("buyStock ", String(data: encoded, encoding: .utf8)!) //debug
+        }
+        return        
+    }
+    
+    func sellStock(_ inputTicker: String, _ numShares: Double,  _ listVM: StockListViewModel) {
+        var oldPortfolioList = self.getPortfolio()
+        //iterate existing portoflio
+   
+        for(index, element) in oldPortfolioList.enumerated() {
+            if (element.ticker == inputTicker) {
+                //found in the list -> update item num Shares
+                var updatePortfolioEntry = oldPortfolioList[index]
+                updatePortfolioEntry.numShares -= numShares
+                if (updatePortfolioEntry.numShares == 0) {
+                    oldPortfolioList.remove(at:index)
+                    self.portfolioList = oldPortfolioList //TODO: get rid of later
+                    if let encoded = try? JSONEncoder().encode(oldPortfolioList) {
+                        Webservice().updateTickerAPI(inputTicker, listVM, true, -numShares) //update the list and ask for the latest stock price
+                        UserDefaults.standard.set(encoded, forKey: "portfolioItems") //update local storage
+                        print("sellStock ", String(data: encoded, encoding: .utf8)!) //debug
+                    }
+                    return
+                }
+                oldPortfolioList[index] = updatePortfolioEntry //update existing portfolio list
+                self.portfolioList = oldPortfolioList //TODO: get rid of later
+                if let encoded = try? JSONEncoder().encode(oldPortfolioList) {
+                    Webservice().updateTickerAPI(inputTicker, listVM, true, -numShares) //update the list and ask for the latest stock price
+                    UserDefaults.standard.set(encoded, forKey: "portfolioItems") //update local storage
+                    print("sellStock ", String(data: encoded, encoding: .utf8)!) //debug
+                }
+                return
+            }
+        }
     }
     
     // method used to add a new stock to watchlist

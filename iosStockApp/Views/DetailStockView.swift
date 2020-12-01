@@ -13,6 +13,7 @@ import KingfisherSwiftUI
 
 struct DetailStockView: View {
     @ObservedObject var detailVM =  DetailViewModel()
+    @ObservedObject var listVM: StockListViewModel
     @State private var showingTradeSheet = false
     
     var stockTicker: String = ""
@@ -29,7 +30,8 @@ struct DetailStockView: View {
     @State private var aboutExpand: Bool = false
     
     
-    init(_ stockTicker:String, _ stockName:String) {
+    init(_ stockTicker:String, _ stockName:String, _ listVM: StockListViewModel) {
+        self.listVM = listVM
         self.stockTicker = stockTicker
         self.stockName = stockName
         self.stockSummary = Stock(stockTicker)
@@ -106,7 +108,7 @@ struct DetailStockView: View {
                             }
                         }
                         .sheet(isPresented: $showingTradeSheet) {
-                            TradeView()
+                            TradeView(self.listVM, self.detailVM, stockTicker, stockName)
                         }
                         
                     }
@@ -226,7 +228,7 @@ struct DetailStockView: View {
 
 struct Detail_Previews: PreviewProvider {
     static var previews: some View {
-        return DetailStockView("TSLA", "Tesla")
+        return DetailStockView("TSLA", "Tesla", StockListViewModel())
     }
     
 }
