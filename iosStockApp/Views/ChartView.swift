@@ -58,13 +58,14 @@ struct WebView: UIViewRepresentable {
     }
 }
 
-struct Display: View {
+struct ChartView: View {
     @State var title: String = ""
     @State var error: Error? = nil
+    @State var stockTicker: String = "TSLA" //from parent
 
     var body: some View {
-        NavigationView {
-            WebView(title: $title, url: URL(string: "http://angularfinance-env.eba-m6bbnkf3.us-east-1.elasticbeanstalk.com/details/aapl")!)
+  
+            WebView(title: $title, url: URL(string: "http://stockappchart-env.eba-xpd25bx3.us-east-2.elasticbeanstalk.com/iosChart/"+stockTicker)!)
                 .onLoadStatusChanged { loading, error in
                     if loading {
                         print("Loading started")
@@ -84,13 +85,13 @@ struct Display: View {
                     }
             }
            
-        }
+        
     }
 }
 
 struct WebView_Previews: PreviewProvider {
     static var previews: some View {
-        Display()
+        ChartView()
     }
 }
 

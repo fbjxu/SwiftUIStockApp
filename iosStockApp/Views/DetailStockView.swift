@@ -20,8 +20,7 @@ struct DetailStockView: View {
     var stockName: String = ""
     private var webService = Webservice()
     private var stockSummary:Stock
-    let items = 1...10
-    let rows = [
+    let rows = [//for stats horizontal scroll view
         GridItem(.flexible(), alignment: .leading),
         GridItem(.flexible(), alignment: .leading)
     ]
@@ -66,11 +65,13 @@ struct DetailStockView: View {
                         }
                         
                     }
-//                    .padding(.horizontal, 10)
+                    .padding(.bottom, 20)
                     
                     Spacer()
                 }
-                
+                //Chart
+                ChartView(stockTicker: self.stockTicker.uppercased())
+                    .frame(minWidth: 100, minHeight: 440)
                 //portfolio
                 
                 VStack (alignment: .leading) {
@@ -89,10 +90,19 @@ struct DetailStockView: View {
                             
                     }
                     HStack {
-                        VStack(alignment: .leading){
-                            Text("You have 0 shares of \(self.stockTicker)")
-                            Text("Start trading!")
+                        if(Storageservice().getNumShares(self.stockTicker)==0){
+                            VStack(alignment: .leading){
+                                Text("You have 0 shares of \(self.stockTicker)")
+                                Text("Start trading!")
+                            }
+                        } else {
+                            VStack(alignment: .leading){
+                                Text("Shares owned: \(String(format: "%.4f",Storageservice().getNumShares(self.stockTicker)))")
+                                Text(" ")
+                                Text("Market Value: $\(String(format: "%.2f",Storageservice().getNumShares(self.stockTicker) * self.detailVM.stockPriceSummaryInfo.last))")
+                            }
                         }
+                        
                         Spacer()
                             
                         Button(action: {
@@ -113,8 +123,9 @@ struct DetailStockView: View {
                         
                     }
                     
-                    .padding(.vertical,  10)
+                    .padding(.vertical,  5)
                 }
+                .offset(y:-10)
                 
 
                 //stats
@@ -228,7 +239,7 @@ struct DetailStockView: View {
 
 struct Detail_Previews: PreviewProvider {
     static var previews: some View {
-        return DetailStockView("TSLA", "Tesla", StockListViewModel())
+        return DetailStockView("F", "Ford", StockListViewModel())
     }
     
 }

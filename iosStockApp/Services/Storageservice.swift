@@ -112,7 +112,7 @@ class Storageservice {
         oldPortfolioList.append(PortfolioItem(ticker:inputTicker, numShares: numShares))
         self.portfolioList = oldPortfolioList
         if let encoded = try? JSONEncoder().encode(oldPortfolioList) {
-            Webservice().updateTickerAPI(inputTicker, listVM, true, numShares) //add this new ticker and ask for the latest stock price
+            Webservice().addTickerAPI(inputTicker, listVM, true, numShares) //add this new ticker and ask for the latest stock price
             UserDefaults.standard.set(encoded, forKey: "portfolioItems") //update local storage
             print("buyStock ", String(data: encoded, encoding: .utf8)!) //debug
         }
@@ -177,6 +177,19 @@ class Storageservice {
             UserDefaults.standard.set(encoded, forKey: "watchlistItems")
             print("deleteWatchlistItem ", String(data: encoded, encoding: .utf8)!)
         }
+    }
+    
+    func getNumShares(_ inputTicker: String) -> Double {
+        var res = 0.0
+        let oldPortfolioList = self.getPortfolio()
+        //iterate existing portoflio
+   
+        for(_, element) in oldPortfolioList.enumerated() {
+            if(element.ticker == inputTicker) {
+                res = element.numShares
+            }
+        }
+        return res
     }
     
     

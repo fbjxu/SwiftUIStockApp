@@ -43,7 +43,7 @@ class Webservice {
     //getNews: given a ticker, get the ticker's list of NewsItems
     func getNews(_ ticker: String, _ detailVM: DetailViewModel) {
         print("called get news")
-        return
+//        return
         let url = "http://angularfinance-env.eba-m6bbnkf3.us-east-1.elasticbeanstalk.com/api/news/"+ticker //unique URL
         AF.request(url).validate().responseData{ (response) in
             if(response.data == nil) {
@@ -87,8 +87,7 @@ class Webservice {
             else {
                 stockListVM.stocks.append(StockViewModel(stock))
             }
-            print("got summary API")
-            print(stockListVM.stocks)
+            print("addTickerAPI")
         }
     }
     

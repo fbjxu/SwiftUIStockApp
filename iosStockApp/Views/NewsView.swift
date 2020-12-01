@@ -98,7 +98,7 @@ struct NewsView: View {
                             }
                             
                         }
-                        KFImage(URL(string: newsItem.urlToImage)!)
+                        KFImage(URL(string: newsItem.urlToImage) ?? URL(string: ""))//TODO: return nill
                             .resizable()
                             .scaledToFill()
                             .frame(width: 90, height: 90)
