@@ -102,6 +102,7 @@ class Storageservice {
                 
                 if let encoded = try? JSONEncoder().encode(oldPortfolioList) {
                     Webservice().updateTickerAPI(inputTicker, listVM, true, numShares) //update the list and ask for the latest stock price
+                    Webservice().updateTickerAPI(inputTicker, listVM, false, numShares) //update watchlist; this method is soft: only update when the item in list
                     UserDefaults.standard.set(encoded, forKey: "portfolioItems") //update local storage
                     print("buyStock ", String(data: encoded, encoding: .utf8)!) //debug
                 }
@@ -133,6 +134,7 @@ class Storageservice {
                     self.portfolioList = oldPortfolioList //TODO: get rid of later
                     if let encoded = try? JSONEncoder().encode(oldPortfolioList) {
                         Webservice().updateTickerAPI(inputTicker, listVM, true, -numShares) //update the list and ask for the latest stock price
+                        Webservice().updateTickerAPI(inputTicker, listVM, false, -numShares) //update watchlist; this method is soft: only update when the item in list
                         UserDefaults.standard.set(encoded, forKey: "portfolioItems") //update local storage
                         print("sellStock ", String(data: encoded, encoding: .utf8)!) //debug
                     }
@@ -142,6 +144,7 @@ class Storageservice {
                 self.portfolioList = oldPortfolioList //TODO: get rid of later
                 if let encoded = try? JSONEncoder().encode(oldPortfolioList) {
                     Webservice().updateTickerAPI(inputTicker, listVM, true, -numShares) //update the list and ask for the latest stock price
+                    Webservice().updateTickerAPI(inputTicker, listVM, false, -numShares) //update watchlist; this method is soft: only update when the item in list
                     UserDefaults.standard.set(encoded, forKey: "portfolioItems") //update local storage
                     print("sellStock ", String(data: encoded, encoding: .utf8)!) //debug
                 }

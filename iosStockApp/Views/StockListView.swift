@@ -35,24 +35,23 @@ struct StockListView: View {
     
     var body: some View {
         NavigationView{
-            List {
-                
-                
-
-                   
+            List {  
                 //search
-                ForEach(
-                    self.searchBarVM.suggestedStocks, id:\.ticker
-                ) { eachSuggestion in
-                    NavigationLink(destination: NavigationLazyView(DetailStockView(eachSuggestion.ticker.uppercased(), eachSuggestion.name, self.listVM))) {
-                        VStack(alignment: .leading) {
-                            Text(eachSuggestion.ticker.uppercased())
-                                .bold()
-                            Text(eachSuggestion.name)
-                                .foregroundColor(.gray)
+                if(!self.searchBar.text.isEmpty) {
+                    ForEach(
+                        self.searchBarVM.suggestedStocks, id:\.ticker
+                    ) { eachSuggestion in
+                        NavigationLink(destination: NavigationLazyView(DetailStockView(eachSuggestion.ticker.uppercased(), eachSuggestion.name, self.listVM))) {
+                            VStack(alignment: .leading) {
+                                Text(eachSuggestion.ticker.uppercased())
+                                    .bold()
+                                Text(eachSuggestion.name)
+                                    .foregroundColor(.gray)
+                            }
                         }
                     }
                 }
+                
                 
                 //stock
                 if(self.searchBar.text.isEmpty) {
@@ -134,8 +133,16 @@ struct StockListView: View {
                                     Text(stock.ticker)
                                         .font(.custom("Arial",size: 22))
                                         .fontWeight(.bold)
+//                                    Text(stock.numShares)
+//                                        .foregroundColor(.gray)
 //                                        .padding(EdgeInsets(top: 0, leading: 0, bottom: 5, trailing: 0))
-
+                                    if(stock.stock.numShares>0) {
+                                        Text(stock.numShares)
+                                            .foregroundColor(.gray)
+                                    } else {
+                                        Text(stock.name)
+                                            .foregroundColor(.gray)
+                                    }
                                 }
 
                                 Spacer()

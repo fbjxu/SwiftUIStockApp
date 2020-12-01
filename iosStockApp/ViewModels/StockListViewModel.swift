@@ -10,6 +10,7 @@ import Foundation
 class StockListViewModel: ObservableObject {
     @Published public var stocks: [StockViewModel] = [StockViewModel]()
     @Published public var portfolioItems: [StockViewModel] = [StockViewModel]()
+    @Published public var cash: Double = 20000
     
     
     //called when init the StockListView
@@ -18,14 +19,16 @@ class StockListViewModel: ObservableObject {
         let webService = Webservice()
         let tickers = localStorage.getWatchlist() //get existing tickers stored in local watchlist
         self.stocks = []
+        let portfolioTickers = localStorage.getPortfolio()
+        self.portfolioItems = []
         for ticker in tickers {
             webService.addTickerAPI(ticker.ticker, self)
         }
-        let portfolioTickers = localStorage.getPortfolio()
-        self.portfolioItems = []
+        
         for portfolioTicker in portfolioTickers {
             webService.addTickerAPI(portfolioTicker.ticker, self, true, portfolioTicker.numShares)
         }
+        print("haha load returned")
     }
     
     func refresh() {

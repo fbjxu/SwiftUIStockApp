@@ -71,22 +71,26 @@ class Webservice {
     
     //addTickerAPI adds the input ticker to the passed in StockListVM and update its price via REST
     func addTickerAPI(_ ticker: String, _ stockListVM: StockListViewModel, _ portfolioOption: Bool = false, _ numShares: Double = 0) {
-        let url = "http://angularfinance-env.eba-m6bbnkf3.us-east-1.elasticbeanstalk.com/api/pricesummary/"+ticker //unique URL
+        let url = "http://stockappchart-env.eba-xpd25bx3.us-east-2.elasticbeanstalk.com/api/nicepricesummary/"+ticker //unique URL
         AF.request(url).validate().responseData{ (response) in
             
             let stockPriceInfo = try! JSON(data: response.data!) //converting response JSON to the swifty JSON struct
             
             let stock = Stock(ticker)
-            stock.price = stockPriceInfo[0]["last"].doubleValue
-            stock.change = stockPriceInfo[0]["last"].doubleValue - stockPriceInfo[0]["prevClose"].doubleValue
-            let companynameURL = "http://angularfinance-env.eba-m6bbnkf3.us-east-1.elasticbeanstalk.com/api/summary/"+ticker //for getting name
-            AF.request(companynameURL).validate().responseData{ (response) in
-                let aboutInfo = try! JSON(data: response.data!) //converting response JSON to the swifty JSON struct
-                stock.name = aboutInfo["name"].stringValue.replacingOccurrences(of: "\"", with: " ").trimmingCharacters(in: .whitespacesAndNewlines)
-            }
-            if portfolioOption {
+            stock.price = stockPriceInfo[0][0]["last"].doubleValue
+            stock.change = stockPriceInfo[0][0]["last"].doubleValue - stockPriceInfo[0][0]["prevClose"].doubleValue
+//            let companynameURL = "http://angularfinance-env.eba-m6bbnkf3.us-east-1.elasticbeanstalk.com/api/summary/"+ticker //for getting name
+//            AF.request(companynameURL).validate().responseData{ (response) in
+//                let aboutInfo = try! JSON(data: response.data!) //converting response JSON to the swifty JSON struct
+//                stock.name = aboutInfo["name"].stringValue.replacingOccurrences(of: "\"", with: " ").trimmingCharacters(in: .whitespacesAndNewlines)
+//            }
+            stock.name = stockPriceInfo[1]["name"].stringValue
+            if(numShares == 0) {
+                stock.numShares = Storageservice().getNumShares(ticker)
+            } else {
                 stock.numShares = numShares
             }
+            
             if portfolioOption {
                 stockListVM.portfolioItems.append(StockViewModel(stock))
             }
@@ -126,11 +130,11 @@ class Webservice {
                 //Watchlist Case
                 for (index,stockVM) in stockListVM.stocks.enumerated() {
                     if(stockVM.ticker == ticker) {
-                        let newstock = stockListVM.portfolioItems[index].stock //get current stock from stockListVM
+                        let newstock = stockListVM.stocks[index].stock //get current stock from stockListVM
                         newstock.price = stockPriceInfo[0]["last"].doubleValue
                         newstock.change = stockPriceInfo[0]["last"].doubleValue - stockPriceInfo[0]["prevClose"].doubleValue
-                        newstock.numShares = numShares
-                        stockListVM.portfolioItems[index].stock = newstock
+                        newstock.numShares += numShares
+                        stockListVM.stocks[index].stock = newstock
                         print("updateTickerPrice for watchlist")
                         return
                     }
