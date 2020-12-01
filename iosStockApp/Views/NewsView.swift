@@ -28,7 +28,7 @@ struct NewsView: View {
                             Spacer()
                         }
                         
-                        KFImage(URL(string: newsItem.urlToImage)!)
+                        KFImage(URL(string: newsItem.urlToImage) ?? URL(string: ""))
                             .resizable()    
                             .scaledToFit()
                             .cornerRadius(15)
@@ -44,13 +44,13 @@ struct NewsView: View {
                         HStack{
                             Text(newsItem.title)
                                 .bold()
-                                .font(.title2)
+                                .font(.title3)
                                 .foregroundColor(.black)
                             Spacer()
                         }
                         
                     }
-                    .padding(.vertical, 6)
+                    .padding(.vertical, 8)
                 }
                 .contextMenu {
                     Button(action: {
@@ -92,7 +92,7 @@ struct NewsView: View {
                                 Text(newsItem.title)
                                     .foregroundColor(.black)
                                     .bold()
-                                    .font(.title3)
+                                    .font(.body)
                                     .lineLimit(3)
                                 Spacer()
                             }
@@ -106,7 +106,7 @@ struct NewsView: View {
                             .cornerRadius(10)
                             
                     }
-                    .padding(.vertical, 6)
+                    .padding(.vertical, 8)
                     
                 }
                 .contextMenu {

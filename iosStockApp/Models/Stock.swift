@@ -12,12 +12,14 @@ class Stock: Codable {
     var price: Double
     var change: Double
     var numShares: Double
+    var name: String
     
     init(_ ticker:String) {
         self.ticker = ticker
         self.price = 0
         self.change = 0
         self.numShares = 0
+        self.name = ""
     }
 }
 

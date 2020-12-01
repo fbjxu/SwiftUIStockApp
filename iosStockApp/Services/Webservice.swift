@@ -21,7 +21,7 @@ class Webservice {
             let stock =
                 PriceSummaryItem(ticker: ticker,
                                     last: stockPriceInfo[0]["last"].doubleValue,
-                                    change: stockPriceInfo[0]["prevClose"].doubleValue - stockPriceInfo[0]["last"].doubleValue,
+                                    change: stockPriceInfo[0]["last"].doubleValue - stockPriceInfo[0]["prevClose"].doubleValue,
                                     low: stockPriceInfo[0]["low"].doubleValue,
                                     bidPrice: stockPriceInfo[0]["bidPrice"].doubleValue,
                                     open: stockPriceInfo[0]["open"].doubleValue,
@@ -43,7 +43,7 @@ class Webservice {
     //getNews: given a ticker, get the ticker's list of NewsItems
     func getNews(_ ticker: String, _ detailVM: DetailViewModel) {
         print("called get news")
-//        return
+        return
         let url = "http://angularfinance-env.eba-m6bbnkf3.us-east-1.elasticbeanstalk.com/api/news/"+ticker //unique URL
         AF.request(url).validate().responseData{ (response) in
             if(response.data == nil) {
@@ -75,9 +75,15 @@ class Webservice {
         AF.request(url).validate().responseData{ (response) in
             
             let stockPriceInfo = try! JSON(data: response.data!) //converting response JSON to the swifty JSON struct
+            
             let stock = Stock(ticker)
             stock.price = stockPriceInfo[0]["last"].doubleValue
-            stock.change = stockPriceInfo[0]["prevClose"].doubleValue - stockPriceInfo[0]["last"].doubleValue
+            stock.change = stockPriceInfo[0]["last"].doubleValue - stockPriceInfo[0]["prevClose"].doubleValue
+            let companynameURL = "http://angularfinance-env.eba-m6bbnkf3.us-east-1.elasticbeanstalk.com/api/summary/"+ticker //for getting name
+            AF.request(companynameURL).validate().responseData{ (response) in
+                let aboutInfo = try! JSON(data: response.data!) //converting response JSON to the swifty JSON struct
+                stock.name = aboutInfo["name"].stringValue.replacingOccurrences(of: "\"", with: " ").trimmingCharacters(in: .whitespacesAndNewlines)
+            }
             if portfolioOption {
                 stock.numShares = numShares
             }
@@ -104,7 +110,7 @@ class Webservice {
                     if(stockVM.ticker == ticker) {
                         let newstock = stockListVM.portfolioItems[index].stock //get current stock from stockListVM
                         newstock.price = stockPriceInfo[0]["last"].doubleValue
-                        newstock.change = stockPriceInfo[0]["prevClose"].doubleValue - stockPriceInfo[0]["last"].doubleValue
+                        newstock.change = stockPriceInfo[0]["last"].doubleValue - stockPriceInfo[0]["prevClose"].doubleValue
                         newstock.numShares += numShares
                         if(newstock.numShares == 0) {
                             stockListVM.portfolioItems.remove(at:index)
@@ -122,7 +128,7 @@ class Webservice {
                     if(stockVM.ticker == ticker) {
                         let newstock = stockListVM.portfolioItems[index].stock //get current stock from stockListVM
                         newstock.price = stockPriceInfo[0]["last"].doubleValue
-                        newstock.change = stockPriceInfo[0]["prevClose"].doubleValue - stockPriceInfo[0]["last"].doubleValue
+                        newstock.change = stockPriceInfo[0]["last"].doubleValue - stockPriceInfo[0]["prevClose"].doubleValue
                         newstock.numShares = numShares
                         stockListVM.portfolioItems[index].stock = newstock
                         print("updateTickerPrice for watchlist")
@@ -144,10 +150,8 @@ class Webservice {
                 print("updated price for \(stockListVM.stocks[index].ticker) \(stockPriceInfo[0]["last"].doubleValue)")
                 let newStock = stockListVM.stocks[index].stock
                 newStock.price = stockPriceInfo[0]["last"].doubleValue
-                newStock.change = stockPriceInfo[0]["prevClose"].doubleValue - stockPriceInfo[0]["last"].doubleValue
+                newStock.change = stockPriceInfo[0]["last"].doubleValue - stockPriceInfo[0]["prevClose"].doubleValue
                 stockListVM.stocks[index].stock = newStock
-//                stockListVM.stocks[index].stock.price = stockPriceInfo[0]["last"].doubleValue
-//                stockListVM.stocks[index].stock.change = stockPriceInfo[0]["prevClose"].doubleValue - stockPriceInfo[0]["last"].doubleValue
                 print("after update for \(newStock.ticker) \( newStock.price)")
             }
         }
@@ -161,7 +165,7 @@ class Webservice {
                 print("updated price for \(stockListVM.portfolioItems[index].ticker) \(stockPriceInfo[0]["last"].doubleValue)")
                 let newStock = stockListVM.portfolioItems[index].stock
                 newStock.price = stockPriceInfo[0]["last"].doubleValue
-                newStock.change = stockPriceInfo[0]["prevClose"].doubleValue - stockPriceInfo[0]["last"].doubleValue
+                newStock.change = stockPriceInfo[0]["last"].doubleValue - stockPriceInfo[0]["prevClose"].doubleValue
                 stockListVM.portfolioItems[index].stock = newStock
 
                 print("after update for \(stockListVM.portfolioItems[index].stock.ticker) \( stockListVM.portfolioItems[index].stock.price)")
@@ -181,7 +185,7 @@ class Webservice {
             //create new stockPriceSummaryItem
             var newStockPriceSummaryInfo = detailVM.stockPriceSummaryInfo
             newStockPriceSummaryInfo.last = stockPriceInfo[0]["last"].doubleValue
-            newStockPriceSummaryInfo.change = stockPriceInfo[0]["prevClose"].doubleValue - stockPriceInfo[0]["last"].doubleValue
+            newStockPriceSummaryInfo.change = stockPriceInfo[0]["last"].doubleValue - stockPriceInfo[0]["prevClose"].doubleValue
             newStockPriceSummaryInfo.low = stockPriceInfo[0]["low"].doubleValue
             newStockPriceSummaryInfo.bidPrice = stockPriceInfo[0]["bidPrice"].doubleValue
             newStockPriceSummaryInfo.open = stockPriceInfo[0]["open"].doubleValue

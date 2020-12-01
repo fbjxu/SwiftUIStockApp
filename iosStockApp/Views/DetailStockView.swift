@@ -15,6 +15,7 @@ struct DetailStockView: View {
     @ObservedObject var detailVM =  DetailViewModel()
     @ObservedObject var listVM: StockListViewModel
     @State private var showingTradeSheet = false
+    var timer = Timer.publish(every: 15, on: .main, in: .common).autoconnect()
     
     var stockTicker: String = ""
     var stockName: String = ""
@@ -61,6 +62,7 @@ struct DetailStockView: View {
                                 .bold()
                             Text("$("+self.detailVM.getChange()+")")
                                 .font(.title2)
+                                .foregroundColor((self.detailVM.stockPriceSummaryInfo.change>=0.0) ? .green : .red)
                             
                         }
                         
@@ -233,6 +235,15 @@ struct DetailStockView: View {
         }
         .padding(.horizontal, 10)
         .navigationBarTitle(Text(self.stockTicker), displayMode: .inline)
+        .onReceive(timer) { input in
+            print("refreshed detail page")
+            Webservice().refreshSinglePriceSummary(self.detailVM)
+        }
+        .onDisappear() {
+            print("cancel timer")
+            self.timer.upstream.connect().cancel()
+
+        }
         
     }
 }
