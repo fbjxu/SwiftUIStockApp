@@ -11,6 +11,7 @@ class StockListViewModel: ObservableObject {
     @Published public var stocks: [StockViewModel] = [StockViewModel]()
     @Published public var portfolioItems: [StockViewModel] = [StockViewModel]()
     @Published public var cash: Double = 20000
+    @Published public var loaded: Bool = false;
     
     
     //called when init the StockListView
@@ -21,14 +22,19 @@ class StockListViewModel: ObservableObject {
         self.stocks = []
         let portfolioTickers = localStorage.getPortfolio()
         self.portfolioItems = []
+        let myGroup = DispatchGroup()
         for ticker in tickers {
-            webService.addTickerAPI(ticker.ticker, self)
+            webService.addTickerAPI(ticker.ticker, self, false, 0, myGroup)
         }
         
         for portfolioTicker in portfolioTickers {
-            webService.addTickerAPI(portfolioTicker.ticker, self, true, portfolioTicker.numShares)
+            webService.addTickerAPI(portfolioTicker.ticker, self, true, portfolioTicker.numShares, myGroup)
         }
-        print("haha load returned")
+        
+        myGroup.notify(queue: .main) {
+            self.loaded = true
+            print("Finished all requests.")
+        }
     }
     
     func refresh() {

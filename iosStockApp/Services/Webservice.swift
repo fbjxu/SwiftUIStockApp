@@ -70,7 +70,8 @@ class Webservice {
     
     
     //addTickerAPI adds the input ticker to the passed in StockListVM and update its price via REST
-    func addTickerAPI(_ ticker: String, _ stockListVM: StockListViewModel, _ portfolioOption: Bool = false, _ numShares: Double = 0) {
+    func addTickerAPI(_ ticker: String, _ stockListVM: StockListViewModel, _ portfolioOption: Bool = false, _ numShares: Double = 0, _ group: DispatchGroup = DispatchGroup()) {
+        group.enter()
         let url = "http://stockappchart-env.eba-xpd25bx3.us-east-2.elasticbeanstalk.com/api/nicepricesummary/"+ticker //unique URL
         AF.request(url).validate().responseData{ (response) in
             
@@ -98,6 +99,8 @@ class Webservice {
                 stockListVM.stocks.append(StockViewModel(stock))
             }
             print("addTickerAPI")
+            group.leave()
+            print("left group for \(ticker)")
         }
     }
     

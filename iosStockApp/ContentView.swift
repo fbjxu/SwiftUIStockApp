@@ -18,13 +18,8 @@ struct NavigationLazyView<Content: View>: View {
 }
 
 struct ContentView: View {
-    @State var isViewDisplayed = false
     
     var body: some View {
-        if(!isViewDisplayed) {
-            ProgressView("Fetching Data...")
-        }
-        
         StockListView()
     }
 }

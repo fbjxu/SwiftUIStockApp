@@ -19,7 +19,7 @@ struct StockListView: View {
     
     var today: String = ""
     var timer = Timer.publish(every: 15, on: .main, in: .common).autoconnect() //for refreshing stock prices
-
+    
     
     init() {
         self.listVM = StockListViewModel()
@@ -34,180 +34,185 @@ struct StockListView: View {
     }
     
     var body: some View {
-        NavigationView{
-            List {  
-                //search
-                if(!self.searchBar.text.isEmpty) {
-                    ForEach(
-                        self.searchBarVM.suggestedStocks, id:\.ticker
-                    ) { eachSuggestion in
-                        NavigationLink(destination: NavigationLazyView(DetailStockView(eachSuggestion.ticker.uppercased(), eachSuggestion.name, self.listVM))) {
-                            VStack(alignment: .leading) {
-                                Text(eachSuggestion.ticker.uppercased())
-                                    .bold()
-                                Text(eachSuggestion.name)
-                                    .foregroundColor(.gray)
-                            }
-                        }
-                    }
-                }
-                
-                
-                //stock
-                if(self.searchBar.text.isEmpty) {
-                    VStack (alignment: .leading) {
-                        Text("\(self.today)")
-                            .font(.custom("Arial", size: 32))
-                            .fontWeight(.bold)
-                            .foregroundColor(Color.gray)
-                    }
-                    Section(header: Text("Input Stock")) {
-                        HStack{
-                            TextField("New Item", text: self.$newStock)
-                            Button(action: {
-                                //update StockListVM
-                                Storageservice().addWatchlistItem(self.newStock, self.listVM)
-                                //reset input
-                                self.newStock=""
-                            }) {
-                                Image(systemName: "plus.circle.fill")
-                                    .foregroundColor(.green)
-                                    .imageScale(.large)
-                            }
-                        }
-                    }
-                    Section(header: Text("PORTFOLIO")) {
-                        ForEach(self.listVM.portfolioItems, id: \.ticker) { stock in
-                            HStack {
-                                
+        
+        if(!self.listVM.loaded) {
+            ProgressView("Fetching Data...")
+        }
+        else{
+            NavigationView{
+                List {
+                    //search
+                    if(!self.searchBar.text.isEmpty) {
+                        ForEach(
+                            self.searchBarVM.suggestedStocks, id:\.ticker
+                        ) { eachSuggestion in
+                            NavigationLink(destination: NavigationLazyView(DetailStockView(eachSuggestion.ticker.uppercased(), eachSuggestion.name, self.listVM))) {
                                 VStack(alignment: .leading) {
-                                    Text(stock.ticker)
-                                        .font(.custom("Arial",size: 22))
-                                        .fontWeight(.bold)
-//                                        .padding(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
-                                    
-                                    Text(stock.numShares)
+                                    Text(eachSuggestion.ticker.uppercased())
+                                        .bold()
+                                    Text(eachSuggestion.name)
                                         .foregroundColor(.gray)
-                                    
                                 }
-                                
-                                Spacer()
-                                
-                                VStack(alignment: .trailing) {
-                                    Text("\(stock.price)")
-                                        .font(.custom("Arial",size: 22))
-                                    
-                                    if(stock.stock.change == 0 ) {
-
-                                        Text("\(stock.change)")
-                                           
-                                            .foregroundColor(.gray)
-                                    }
-                                    else {
-                                        HStack {
-                                            if(stock.stock.change>0) {
-                                                Image(systemName: "arrow.up.forward")
-                                            }
-                                            else {
-                                                Image(systemName: "arrow.up.forward")
-                                                    .rotationEffect(.degrees(90))
-                                            }
-                                            Text("\(stock.change)")
-                                        }
-                           
-                                        .foregroundColor(stock.stock.change>=0 ? .green : .red)
-                                    }
-                                }
-                                
                             }
                         }
                     }
                     
-                    Section(header: Text("FAVORITES")) {
-                        
-                        ForEach(self.listVM.stocks, id: \.ticker) { stock in
-//                            StockCellView(stock:stock)
-                            HStack {
-
-                                VStack(alignment: .leading) {
-                                    Text(stock.ticker)
-                                        .font(.custom("Arial",size: 22))
-                                        .fontWeight(.bold)
-//                                    Text(stock.numShares)
-//                                        .foregroundColor(.gray)
-//                                        .padding(EdgeInsets(top: 0, leading: 0, bottom: 5, trailing: 0))
-                                    if(stock.stock.numShares>0) {
-                                        Text(stock.numShares)
-                                            .foregroundColor(.gray)
-                                    } else {
-                                        Text(stock.name)
-                                            .foregroundColor(.gray)
-                                    }
+                    
+                    //stock
+                    if(self.searchBar.text.isEmpty) {
+                        VStack (alignment: .leading) {
+                            Text("\(self.today)")
+                                .font(.custom("Arial", size: 32))
+                                .fontWeight(.bold)
+                                .foregroundColor(Color.gray)
+                        }
+                        Section(header: Text("Input Stock")) {
+                            HStack{
+                                TextField("New Item", text: self.$newStock)
+                                Button(action: {
+                                    //update StockListVM
+                                    Storageservice().addWatchlistItem(self.newStock, self.listVM)
+                                    //reset input
+                                    self.newStock=""
+                                }) {
+                                    Image(systemName: "plus.circle.fill")
+                                        .foregroundColor(.green)
+                                        .imageScale(.large)
                                 }
-
-                                Spacer()
-
-                                VStack(alignment: .trailing) {
-                                    Text("\(stock.price)")
-                                        .font(.custom("Arial",size: 22))
-                                    
-                                    if(stock.stock.change == 0 ) {
-
-                                        Text("\(stock.change)")
-                                           
-                                            .foregroundColor(.gray)
-                                    }
-                                    else {
-                                        HStack {
-                                            if(stock.stock.change>0) {
-                                                Image(systemName: "arrow.up.forward")
-                                            }
-                                            else {
-                                                Image(systemName: "arrow.up.forward")
-                                                    .rotationEffect(.degrees(90))
-                                            }
-                                            Text("\(stock.change)")
-                                        }
-                           
-                                        .foregroundColor(stock.stock.change>=0 ? .green : .red)
-                                    }
-                                }
-
                             }
                         }
-                        .onDelete{ indexSet in
-                            let deleteItem = self.listVM.stocks[indexSet.first!]
-                            Storageservice().removeWatchlistItem(deleteItem.ticker, self.listVM)
-                            listVM.stocks.remove(atOffsets: indexSet)
+                        Section(header: Text("PORTFOLIO")) {
+                            ForEach(self.listVM.portfolioItems, id: \.ticker) { stock in
+                                HStack {
+                                    
+                                    VStack(alignment: .leading) {
+                                        Text(stock.ticker)
+                                            .font(.custom("Arial",size: 22))
+                                            .fontWeight(.bold)
+                                        //                                        .padding(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
+                                        
+                                        Text(stock.numShares)
+                                            .foregroundColor(.gray)
+                                        
+                                    }
+                                    
+                                    Spacer()
+                                    
+                                    VStack(alignment: .trailing) {
+                                        Text("\(stock.price)")
+                                            .font(.custom("Arial",size: 22))
+                                        
+                                        if(stock.stock.change == 0 ) {
+                                            
+                                            Text("\(stock.change)")
+                                                
+                                                .foregroundColor(.gray)
+                                        }
+                                        else {
+                                            HStack {
+                                                if(stock.stock.change>0) {
+                                                    Image(systemName: "arrow.up.forward")
+                                                }
+                                                else {
+                                                    Image(systemName: "arrow.up.forward")
+                                                        .rotationEffect(.degrees(90))
+                                                }
+                                                Text("\(stock.change)")
+                                            }
+                                            
+                                            .foregroundColor(stock.stock.change>=0 ? .green : .red)
+                                        }
+                                    }
+                                    
+                                }
+                            }
                         }
+                        
+                        Section(header: Text("FAVORITES")) {
+                            
+                            ForEach(self.listVM.stocks, id: \.ticker) { stock in
+                                //                            StockCellView(stock:stock)
+                                HStack {
+                                    
+                                    VStack(alignment: .leading) {
+                                        Text(stock.ticker)
+                                            .font(.custom("Arial",size: 22))
+                                            .fontWeight(.bold)
+                                        //                                    Text(stock.numShares)
+                                        //                                        .foregroundColor(.gray)
+                                        //                                        .padding(EdgeInsets(top: 0, leading: 0, bottom: 5, trailing: 0))
+                                        if(stock.stock.numShares>0) {
+                                            Text(stock.numShares)
+                                                .foregroundColor(.gray)
+                                        } else {
+                                            Text(stock.name)
+                                                .foregroundColor(.gray)
+                                        }
+                                    }
+                                    
+                                    Spacer()
+                                    
+                                    VStack(alignment: .trailing) {
+                                        Text("\(stock.price)")
+                                            .font(.custom("Arial",size: 22))
+                                        
+                                        if(stock.stock.change == 0 ) {
+                                            
+                                            Text("\(stock.change)")
+                                                
+                                                .foregroundColor(.gray)
+                                        }
+                                        else {
+                                            HStack {
+                                                if(stock.stock.change>0) {
+                                                    Image(systemName: "arrow.up.forward")
+                                                }
+                                                else {
+                                                    Image(systemName: "arrow.up.forward")
+                                                        .rotationEffect(.degrees(90))
+                                                }
+                                                Text("\(stock.change)")
+                                            }
+                                            
+                                            .foregroundColor(stock.stock.change>=0 ? .green : .red)
+                                        }
+                                    }
+                                    
+                                }
+                            }
+                            .onDelete{ indexSet in
+                                let deleteItem = self.listVM.stocks[indexSet.first!]
+                                Storageservice().removeWatchlistItem(deleteItem.ticker, self.listVM)
+                                listVM.stocks.remove(atOffsets: indexSet)
+                            }
+                        }
+                        Link("Powered by Tiingo", destination: URL(string: "https://www.tiingo.com")!)
+                            .font(.body)
+                            .foregroundColor(.gray)
+                            .frame(maxWidth: .infinity, alignment: .center)
                     }
-                    Link("Powered by Tiingo", destination: URL(string: "https://www.tiingo.com")!)
-                        .font(.body)
-                        .foregroundColor(.gray)
-                        .frame(maxWidth: .infinity, alignment: .center)
+                    
+                    
+                }
+                .add(self.searchBar)
+                .listStyle(PlainListStyle()) //used to get rid of padding
+                .navigationTitle("Stock")
+                .navigationBarItems(trailing: EditButton())
+            }
+            .onReceive(timer) { input in
+                print("activate timer")
+                if(!self.searchBar.text.isEmpty) {
+                    print("do not update")
+                    
+                } else {
+                    print("refresh list prices")
+                    Webservice().refreshPriceSummary(self.listVM)
                 }
                 
-                
-            }
-            .add(self.searchBar)
-            .listStyle(PlainListStyle()) //used to get rid of padding
-            .navigationTitle("Stock")
-            .navigationBarItems(trailing: EditButton())
-        }
-        .onReceive(timer) { input in
-            print("activate timer")
-            if(!self.searchBar.text.isEmpty) {
-                print("do not update")
-                
-            } else {
-                print("refresh list prices")
-                Webservice().refreshPriceSummary(self.listVM)
-            }
-            
-        }
+            }}
     }
     
-
+    
 }
 
 
@@ -235,9 +240,9 @@ struct StockCellView: View {
                     .font(.custom("Arial",size: 22))
                 
                 if(stock.stock.change == 0 ) {
-
+                    
                     Text("\(stock.change)")
-                       
+                        
                         .foregroundColor(.gray)
                 }
                 else {
@@ -251,7 +256,7 @@ struct StockCellView: View {
                         }
                         Text("\(stock.change)")
                     }
-       
+                    
                     .foregroundColor(stock.stock.change>=0 ? .green : .red)
                 }
             }
@@ -292,7 +297,7 @@ struct PortfolioCellView: View {
                         .rotationEffect(.degrees(90))
                     Text(stock.change)
                         .padding(5)
-                        
+                    
                 }
                 .foregroundColor(stock.stock.change>=0 ? .green : .red)
                 
