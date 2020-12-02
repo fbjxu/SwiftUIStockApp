@@ -11,11 +11,20 @@ class DetailViewModel: ObservableObject {
     @Published public var stockPriceSummaryInfo: PriceSummaryItem = PriceSummaryItem(ticker: "", last: 0, change: 0, low: 0, bidPrice: 0, open: 0, mid: 0)
     @Published public var stockNews: [NewsItem] = [NewsItem]()
     @Published public var stockAboutInfo: String = ""
+    @Published public var detailLoaded = false
+    @Published public var favored = false
     
     func getPriceSummary(_ ticker: String) {
-        Webservice().getStockPriceSummary(ticker, self)
-        Webservice().getAbout(ticker, self)
-        Webservice().getNews(ticker, self)
+        let detailPageGroup = DispatchGroup()
+        Webservice().getStockPriceSummary(ticker, self, detailPageGroup)
+        Webservice().getAbout(ticker, self, detailPageGroup)
+        Webservice().getNews(ticker, self, detailPageGroup)
+        detailPageGroup.notify(queue: .main) {
+            self.favored = Storageservice().isFavored(ticker)
+            self.detailLoaded = true
+            print("Finished all requests for detail page.")
+        }
+        
     }
     
     

@@ -41,208 +41,233 @@ struct DetailStockView: View {
     }
     
     var body: some View {
-        ScrollView(.vertical, showsIndicators: false) {
-            LazyVStack(alignment: .leading, spacing: 0) {
-                //symbol and prices
-                HStack{
-                    
-                    
-                    VStack (alignment:.leading) {
-                        Text(self.stockTicker.uppercased())
-                            .font(.largeTitle)
-                            .bold()
-                        
-                        
-                        Text(self.stockName)
-                            .foregroundColor(.gray)
-                        
-                        HStack {
-                            Text("$"+self.detailVM.getLast())
-                                .font(.title)
+        if (!self.detailVM.detailLoaded){
+            ProgressView("Fetching Data...")
+        }
+        else {
+            
+            ScrollView(.vertical, showsIndicators: false) {
+                LazyVStack(alignment: .leading, spacing: 0) {
+                    //symbol and prices
+                    HStack{
+                        VStack (alignment:.leading) {
+                            Text(self.stockTicker.uppercased())
+                                .font(.largeTitle)
                                 .bold()
-                            Text("$("+self.detailVM.getChange()+")")
-                                .font(.title2)
-                                .foregroundColor((self.detailVM.stockPriceSummaryInfo.change>=0.0) ? .green : .red)
                             
-                        }
-                        
-                    }
-                    .padding(.bottom, 20)
-                    
-                    Spacer()
-                }
-                //Chart
-                ChartView(stockTicker: self.stockTicker.uppercased())
-                    .frame(minWidth: 100, minHeight: 440)
-                //portfolio
-                
-                VStack (alignment: .leading) {
-                    
-                    HStack{
-                        
-                        VStack (alignment:.leading, spacing: 0) {
-                            Text("Portfolio")
-                                .font(.title)
-                                .padding(.vertical, 8)
                             
-
+                            Text(self.stockName)
+                                .foregroundColor(.gray)
                             
-                        }
-                        Spacer()
-                            
-                    }
-                    HStack {
-                        if(Storageservice().getNumShares(self.stockTicker)==0){
-                            VStack(alignment: .leading){
-                                Text("You have 0 shares of \(self.stockTicker)")
-                                Text("Start trading!")
-                            }
-                        } else {
-                            VStack(alignment: .leading){
-                                Text("Shares owned: \(String(format: "%.4f",Storageservice().getNumShares(self.stockTicker)))")
-                                Text(" ")
-                                Text("Market Value: $\(String(format: "%.2f",Storageservice().getNumShares(self.stockTicker) * self.detailVM.stockPriceSummaryInfo.last))")
-                            }
-                        }
-                        
-                        Spacer()
-                            
-                        Button(action: {
-                            self.showingTradeSheet.toggle()
-                        }) {
-                            ZStack {
-                                RoundedRectangle(cornerRadius: 25)
-                                    .frame(width: 130, height: 50, alignment: .center)
-                                    .foregroundColor(.green)
-                                Text("Trade")
+                            HStack {
+                                Text("$"+self.detailVM.getLast())
+                                    .font(.title)
                                     .bold()
-                                    .foregroundColor(.white)
-                            }
-                        }
-                        .sheet(isPresented: $showingTradeSheet) {
-                            TradeView(self.listVM, self.detailVM, stockTicker, stockName)
-                        }
-                        
-                    }
-                    
-                    .padding(.vertical,  5)
-                }
-                .offset(y:-10)
-                
-
-                //stats
-                VStack (alignment: .leading) {
-                    
-                    HStack{
-                        
-                        VStack (alignment:.leading, spacing: 0) {
-                            Text("Stats")
-                                .font(.title)
-                                .padding(.vertical, 8)
-                            ScrollView(.horizontal) {
-                                LazyHGrid(rows: threeColumnGrid) {
-                                    
-                                    Text("Current Price: " + self.detailVM.getLast())
-                                        .font(.body)
-                                    
-                                    
-                                    
-                                    Text("Open Price: " + self.detailVM.getOpen())
-                                        .font(.body)
-                                        .multilineTextAlignment(.leading)
-                                        .padding(.leading, -18.0)
-                                    
-                                    
-                                    Text("Low: " + self.detailVM.getLow())
-                                        .font(.body)
-                                    
-                                    Text("Mid: " + self.detailVM.getMid())
-                                        .font(.body)
-                                        .padding(.leading, -18.0)
-                                    
-                                    Text("Bid Price: " + self.detailVM.getBidPrice())
-                                        .font(.body)
-                                }
-                                
+                                Text("$("+self.detailVM.getChange()+")")
+                                    .font(.title2)
+                                    .foregroundColor((self.detailVM.stockPriceSummaryInfo.change>=0.0) ? .green : .red)
                                 
                             }
-//                            .frame(maxHeight:100)
                             
                         }
-//                        .padding(.horizontal, 10)
+                        .padding(.bottom, 20)
                         
                         Spacer()
                     }
-                }
-                
-                //about
-                VStack (alignment: .leading) {
+                    //Chart
+                    ChartView(stockTicker: self.stockTicker.uppercased())
+                        .frame(minWidth: 100, minHeight: 440)
+                    //portfolio
                     
-                    HStack{
+                    VStack (alignment: .leading) {
                         
-                        VStack (alignment:.leading, spacing: 0) {
-                            Text("About")
-                                .font(.title)
-                                .padding(.vertical, 8)
+                        HStack{
                             
-                            Text(detailVM.stockAboutInfo)
-                                .lineLimit(aboutExpand ? nil:/*@START_MENU_TOKEN@*/2/*@END_MENU_TOKEN@*/)
+                            VStack (alignment:.leading, spacing: 0) {
+                                Text("Portfolio")
+                                    .font(.title)
+                                    .padding(.vertical, 8)
+                                
+                                
+                                
+                            }
+                            Spacer()
                             
+                        }
+                        HStack {
+                            if(Storageservice().getNumShares(self.stockTicker)==0){
+                                VStack(alignment: .leading){
+                                    Text("You have 0 shares of \(self.stockTicker)")
+                                    Text("Start trading!")
+                                }
+                            } else {
+                                VStack(alignment: .leading){
+                                    Text("Shares owned: \(String(format: "%.4f",Storageservice().getNumShares(self.stockTicker)))")
+                                    Text(" ")
+                                    Text("Market Value: $\(String(format: "%.2f",Storageservice().getNumShares(self.stockTicker) * self.detailVM.stockPriceSummaryInfo.last))")
+                                }
+                            }
                             
-                            if(!aboutExpand){
-                                HStack {
-                                    Spacer()
-                                    Button(action: {
-                                        withAnimation {
-                                            self.aboutExpand.toggle()
-                                        }
+                            Spacer()
+                            
+                            Button(action: {
+                                self.showingTradeSheet.toggle()
+                            }) {
+                                ZStack {
+                                    RoundedRectangle(cornerRadius: 25)
+                                        .frame(width: 130, height: 50, alignment: .center)
+                                        .foregroundColor(.green)
+                                    Text("Trade")
+                                        .bold()
+                                        .foregroundColor(.white)
+                                }
+                            }
+                            .sheet(isPresented: $showingTradeSheet) {
+                                TradeView(self.listVM, self.detailVM, stockTicker, stockName)
+                            }
+                            
+                        }
+                        
+                        .padding(.vertical,  5)
+                    }
+                    .offset(y:-10)
+                    
+                    
+                    //stats
+                    VStack (alignment: .leading) {
+                        
+                        HStack{
+                            
+                            VStack (alignment:.leading, spacing: 0) {
+                                Text("Stats")
+                                    .font(.title)
+                                    .padding(.vertical, 8)
+                                ScrollView(.horizontal) {
+                                    LazyHGrid(rows: threeColumnGrid) {
                                         
-                                    }) {
-                                        Text("Show more...")
-                                            .foregroundColor(.gray)
+                                        Text("Current Price: " + self.detailVM.getLast())
+                                            .font(.body)
+                                        
+                                        
+                                        
+                                        Text("Open Price: " + self.detailVM.getOpen())
+                                            .font(.body)
+                                            .multilineTextAlignment(.leading)
+                                            .padding(.leading, -18.0)
+                                        
+                                        
+                                        Text("Low: " + self.detailVM.getLow())
+                                            .font(.body)
+                                        
+                                        Text("Mid: " + self.detailVM.getMid())
+                                            .font(.body)
+                                            .padding(.leading, -18.0)
+                                        
+                                        Text("Bid Price: " + self.detailVM.getBidPrice())
+                                            .font(.body)
                                     }
+                                    
+                                    
                                 }
+                                //                            .frame(maxHeight:100)
+                                
                             }
+                            //                        .padding(.horizontal, 10)
                             
-                            if(aboutExpand) {
-                                HStack {
-                                    Spacer()
-                                    Button(action: {self.aboutExpand.toggle()}) {
-                                        withAnimation {
-                                            Text("Show less...")
-                                        }
-                                        .foregroundColor(.gray)
-                                    }
-                                }
-                            }
-                            
-                            
+                            Spacer()
                         }
-//                        .padding(.horizontal, 10)
-                        
-                        Spacer()
                     }
+                    
+                    //about
+                    VStack (alignment: .leading) {
+                        
+                        HStack{
+                            
+                            VStack (alignment:.leading, spacing: 0) {
+                                Text("About")
+                                    .font(.title)
+                                    .padding(.vertical, 8)
+                                
+                                Text(detailVM.stockAboutInfo)
+                                    .lineLimit(aboutExpand ? nil:/*@START_MENU_TOKEN@*/2/*@END_MENU_TOKEN@*/)
+                                
+                                
+                                if(!aboutExpand){
+                                    HStack {
+                                        Spacer()
+                                        Button(action: {
+                                            withAnimation {
+                                                self.aboutExpand.toggle()
+                                            }
+                                            
+                                        }) {
+                                            Text("Show more...")
+                                                .foregroundColor(.gray)
+                                        }
+                                    }
+                                }
+                                
+                                if(aboutExpand) {
+                                    HStack {
+                                        Spacer()
+                                        Button(action: {self.aboutExpand.toggle()}) {
+                                            withAnimation {
+                                                Text("Show less...")
+                                            }
+                                            .foregroundColor(.gray)
+                                        }
+                                    }
+                                }
+                                
+                                
+                            }
+                            //                        .padding(.horizontal, 10)
+                            
+                            Spacer()
+                        }
+                    }
+                    
+                    
+                    //News
+                    //first news
+                    NewsView(self.detailVM)
+                    Spacer()
+                    
+                    
                 }
-                
-                
-                //News
-                //first news
-                NewsView(self.detailVM)
-                Spacer()
-                
+            }
+            .padding(.horizontal, 10)
+            .navigationBarTitle(Text(self.stockTicker), displayMode: .inline)
+            .navigationBarItems(trailing: self.detailVM.favored ?
+                                        Button(action: {
+                    //stock favored
+                                            self.detailVM.favored = false
+                                            Storageservice().removeWatchlistItem(self.stockTicker, self.listVM)
+                }) {
+                    Image(systemName: "plus.circle.fill")
+                        .foregroundColor(.blue)
+                        .imageScale(.large)
+                                        } :
+                                        Button(action: {
+                    //stock not favored
+                                            self.detailVM.favored = true
+                                            Storageservice().addWatchlistItem(self.stockTicker, self.listVM)
+                }) {
+                    Image(systemName: "plus.circle")
+                        .foregroundColor(.blue)
+                        .imageScale(.large)
+                }
+            )
+            .onReceive(timer) { input in
+                print("refreshed detail page")
+                Webservice().refreshSinglePriceSummary(self.detailVM)
+            }
+            .onDisappear() {
+                print("cancel timer")
+                self.timer.upstream.connect().cancel()
                 
             }
-        }
-        .padding(.horizontal, 10)
-        .navigationBarTitle(Text(self.stockTicker), displayMode: .inline)
-        .onReceive(timer) { input in
-            print("refreshed detail page")
-            Webservice().refreshSinglePriceSummary(self.detailVM)
-        }
-        .onDisappear() {
-            print("cancel timer")
-            self.timer.upstream.connect().cancel()
-
+            
         }
         
     }

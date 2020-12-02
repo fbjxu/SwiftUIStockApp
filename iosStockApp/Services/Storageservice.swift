@@ -175,6 +175,15 @@ class Storageservice {
     
     // method used to remove a new stock to watchlist
     func removeWatchlistItem(_ inputTicker: String, _ listVM: StockListViewModel) {
+        
+        //update view
+        for (index, element) in listVM.stocks.enumerated() {
+            if (element.ticker == inputTicker) {
+                listVM.stocks.remove(at:index)
+                break
+            }
+        }
+        //update local storage
         let oldWatchList = self.getWatchlist()
         var newWatchlist = [WatchListItem]()
         for watchlistItem in oldWatchList { //iterate old watchlist and create new list without the input ticker stock
@@ -198,6 +207,19 @@ class Storageservice {
         for(_, element) in oldPortfolioList.enumerated() {
             if(element.ticker == inputTicker) {
                 res = element.numShares
+                break
+            }
+        }
+        return res
+    }
+    
+    func isFavored(_ inputTicker: String)->Bool {
+        var res = false
+        let watchlist = self.getWatchlist()
+        for item in watchlist {
+            if (item.ticker == inputTicker) {
+                res = true
+                break
             }
         }
         return res

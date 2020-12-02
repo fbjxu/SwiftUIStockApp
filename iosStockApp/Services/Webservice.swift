@@ -13,7 +13,8 @@ class Webservice {
     
     
     //getStockPriceSummary: given a ticker, get all stock summary information including
-    func getStockPriceSummary(_ ticker: String, _ detailVM: DetailViewModel) {
+    func getStockPriceSummary(_ ticker: String, _ detailVM: DetailViewModel, _ group: DispatchGroup = DispatchGroup()) {
+        group.enter()
         let url = "http://angularfinance-env.eba-m6bbnkf3.us-east-1.elasticbeanstalk.com/api/pricesummary/"+ticker //unique URL
         AF.request(url).validate().responseData{ (response) in
             
@@ -27,23 +28,27 @@ class Webservice {
                                     open: stockPriceInfo[0]["open"].doubleValue,
                                     mid: stockPriceInfo[0]["mid"].doubleValue)
             detailVM.stockPriceSummaryInfo = stock
+            group.leave()
         }
     
     }
     
     //getAbout: given a ticker, get the company summary
-    func getAbout(_ ticker: String, _ detailVM: DetailViewModel) {
+    func getAbout(_ ticker: String, _ detailVM: DetailViewModel, _ group: DispatchGroup = DispatchGroup()) {
+        group.enter()
         let url = "http://angularfinance-env.eba-m6bbnkf3.us-east-1.elasticbeanstalk.com/api/summary/"+ticker //unique URL
         AF.request(url).validate().responseData{ (response) in
             let aboutInfo = try! JSON(data: response.data!) //converting response JSON to the swifty JSON struct
             detailVM.stockAboutInfo = aboutInfo["description"].stringValue.replacingOccurrences(of: "\"", with: " ").trimmingCharacters(in: .whitespacesAndNewlines)
+            group.leave()
         }
     }
     
     //getNews: given a ticker, get the ticker's list of NewsItems
-    func getNews(_ ticker: String, _ detailVM: DetailViewModel) {
+    func getNews(_ ticker: String, _ detailVM: DetailViewModel, _ group: DispatchGroup = DispatchGroup()) {
+        group.enter()
         print("called get news")
-        return
+//        return
         let url = "http://angularfinance-env.eba-m6bbnkf3.us-east-1.elasticbeanstalk.com/api/news/"+ticker //unique URL
         AF.request(url).validate().responseData{ (response) in
             if(response.data == nil) {
@@ -64,6 +69,7 @@ class Webservice {
    
             }
             detailVM.stockNews = updatedNews
+            group.leave()
         }
     }
     
