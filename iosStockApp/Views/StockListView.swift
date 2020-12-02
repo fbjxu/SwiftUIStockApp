@@ -90,48 +90,54 @@ struct StockListView: View {
                                     .bold()
                             }
                             ForEach(self.listVM.portfolioItems, id: \.ticker) { stock in
-                                HStack {
-                                    
-                                    VStack(alignment: .leading) {
-                                        Text(stock.ticker)
-                                            .font(.custom("Arial",size: 22))
-                                            .fontWeight(.bold)
-                                        //                                        .padding(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
+                                NavigationLink(destination: NavigationLazyView(DetailStockView(stock.ticker.uppercased(), stock.name, self.listVM))) {
+                                    HStack {
                                         
-                                        Text(stock.numShares)
-                                            .foregroundColor(.gray)
-                                        
-                                    }
-                                    
-                                    Spacer()
-                                    
-                                    VStack(alignment: .trailing) {
-                                        Text("\(stock.price)")
-                                            .font(.custom("Arial",size: 22))
-                                        
-                                        if(stock.stock.change == 0 ) {
+                                        VStack(alignment: .leading) {
+                                            Text(stock.ticker)
+                                                .font(.custom("Arial",size: 22))
+                                                .fontWeight(.bold)
+                                            //                                        .padding(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
                                             
-                                            Text("\(stock.change)")
-                                                
+                                            Text(stock.numShares)
                                                 .foregroundColor(.gray)
-                                        }
-                                        else {
-                                            HStack {
-                                                if(stock.stock.change>0) {
-                                                    Image(systemName: "arrow.up.forward")
-                                                }
-                                                else {
-                                                    Image(systemName: "arrow.up.forward")
-                                                        .rotationEffect(.degrees(90))
-                                                }
-                                                Text("\(stock.change)")
-                                            }
                                             
-                                            .foregroundColor(stock.stock.change>=0 ? .green : .red)
                                         }
+                                        
+                                        Spacer()
+                                        
+                                        VStack(alignment: .trailing) {
+                                            Text("\(stock.price)")
+                                                .font(.custom("Arial",size: 22))
+                                            
+                                            if(stock.stock.change == 0 ) {
+                                                
+                                                Text("\(stock.change)")
+                                                    
+                                                    .foregroundColor(.gray)
+                                            }
+                                            else {
+                                                HStack {
+                                                    if(stock.stock.change>0) {
+                                                        Image(systemName: "arrow.up.forward")
+                                                    }
+                                                    else {
+                                                        Image(systemName: "arrow.up.forward")
+                                                            .rotationEffect(.degrees(90))
+                                                    }
+                                                    Text("\(stock.change)")
+                                                }
+                                                
+                                                .foregroundColor(stock.stock.change>=0 ? .green : .red)
+                                            }
+                                        }
+                                        
                                     }
-                                    
                                 }
+                                
+                            }
+                            .onMove{ (indexSet, index) in
+                                listVM.stocks.move(fromOffsets: indexSet, toOffset: index)
                             }
                         }
                         
@@ -139,62 +145,68 @@ struct StockListView: View {
                             
                             ForEach(self.listVM.stocks, id: \.ticker) { stock in
                                 //                            StockCellView(stock:stock)
-                                HStack {
-                                    
-                                    VStack(alignment: .leading) {
-                                        Text(stock.ticker)
-                                            .font(.custom("Arial",size: 22))
-                                            .fontWeight(.bold)
-                                        //                                    Text(stock.numShares)
-                                        //                                        .foregroundColor(.gray)
-                                        //                                        .padding(EdgeInsets(top: 0, leading: 0, bottom: 5, trailing: 0))
-                                        if(stock.stock.numShares>0) {
-                                            Text(stock.numShares)
-                                                .foregroundColor(.gray)
-                                        } else {
-                                            Text(stock.name)
-                                                .foregroundColor(.gray)
-                                        }
-                                    }
-                                    
-                                    Spacer()
-                                    
-                                    VStack(alignment: .trailing) {
-                                        Text("\(stock.price)")
-                                            .font(.custom("Arial",size: 22))
+                                NavigationLink(destination: NavigationLazyView(DetailStockView(stock.ticker.uppercased(), stock.name, self.listVM))) {
+                                    HStack {
                                         
-                                        if(stock.stock.change == 0 ) {
-                                            
-                                            Text("\(stock.change)")
-                                                
-                                                .foregroundColor(.gray)
-                                        }
-                                        else {
-                                            HStack {
-                                                if(stock.stock.change>0) {
-                                                    Image(systemName: "arrow.up.forward")
-                                                }
-                                                else {
-                                                    Image(systemName: "arrow.up.forward")
-                                                        .rotationEffect(.degrees(90))
-                                                }
-                                                Text("\(stock.change)")
+                                        VStack(alignment: .leading) {
+                                            Text(stock.ticker)
+                                                .font(.custom("Arial",size: 22))
+                                                .fontWeight(.bold)
+                                            //                                    Text(stock.numShares)
+                                            //                                        .foregroundColor(.gray)
+                                            //                                        .padding(EdgeInsets(top: 0, leading: 0, bottom: 5, trailing: 0))
+                                            if(stock.stock.numShares>0) {
+                                                Text(stock.numShares)
+                                                    .foregroundColor(.gray)
+                                            } else {
+                                                Text(stock.name)
+                                                    .foregroundColor(.gray)
                                             }
-                                            
-                                            .foregroundColor(stock.stock.change>=0 ? .green : .red)
                                         }
+                                        
+                                        Spacer()
+                                        
+                                        VStack(alignment: .trailing) {
+                                            Text("\(stock.price)")
+                                                .font(.custom("Arial",size: 22))
+                                            
+                                            if(stock.stock.change == 0 ) {
+                                                
+                                                Text("\(stock.change)")
+                                                    
+                                                    .foregroundColor(.gray)
+                                            }
+                                            else {
+                                                HStack {
+                                                    if(stock.stock.change>0) {
+                                                        Image(systemName: "arrow.up.forward")
+                                                    }
+                                                    else {
+                                                        Image(systemName: "arrow.up.forward")
+                                                            .rotationEffect(.degrees(90))
+                                                    }
+                                                    Text("\(stock.change)")
+                                                }
+                                                
+                                                .foregroundColor(stock.stock.change>=0 ? .green : .red)
+                                            }
+                                        }
+                                        
                                     }
-                                    
                                 }
+                                
                             }
                             .onDelete{ indexSet in
                                 let deleteItem = self.listVM.stocks[indexSet.first!]
                                 Storageservice().removeWatchlistItem(deleteItem.ticker, self.listVM)
                                 listVM.stocks.remove(atOffsets: indexSet)
                             }
+                            .onMove{ (indexSet, index) in
+                                listVM.stocks.move(fromOffsets: indexSet, toOffset: index)
+                            }
                         }
                         Link("Powered by Tiingo", destination: URL(string: "https://www.tiingo.com")!)
-                            .font(.body)
+                            .font(.footnote)
                             .foregroundColor(.gray)
                             .frame(maxWidth: .infinity, alignment: .center)
                     }
@@ -216,9 +228,10 @@ struct StockListView: View {
                     Webservice().refreshPriceSummary(self.listVM)
                 }
                 
-            }}
+            }
+            
+        }
     }
-    
     
 }
 
