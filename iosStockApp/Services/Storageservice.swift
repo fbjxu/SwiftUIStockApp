@@ -93,7 +93,7 @@ class Storageservice {
         var oldPortfolioList = self.getPortfolio()
         //if the list contains the ticker
         for(index, element) in oldPortfolioList.enumerated() {
-            if (element.ticker == inputTicker) {
+            if (element.ticker.uppercased() == inputTicker.uppercased()) {
                 //found in the list -> update item num Shares
                 var updatePortfolioEntry = oldPortfolioList[index]
                 updatePortfolioEntry.numShares += numShares
@@ -129,7 +129,7 @@ class Storageservice {
         //iterate existing portoflio
    
         for(index, element) in oldPortfolioList.enumerated() {
-            if (element.ticker == inputTicker) {
+            if (element.ticker.uppercased() == inputTicker.uppercased()) {
                 //found in the list -> update item num Shares
                 var updatePortfolioEntry = oldPortfolioList[index]
                 updatePortfolioEntry.numShares -= numShares
@@ -178,22 +178,22 @@ class Storageservice {
         
         //update view
         for (index, element) in listVM.stocks.enumerated() {
-            if (element.ticker == inputTicker) {
+            if (element.ticker.uppercased() == inputTicker.uppercased()) {
                 listVM.stocks.remove(at:index)
                 break
             }
         }
         //update local storage
-        let oldWatchList = self.getWatchlist()
-        var newWatchlist = [WatchListItem]()
-        for watchlistItem in oldWatchList { //iterate old watchlist and create new list without the input ticker stock
-            if (watchlistItem.ticker.uppercased() != inputTicker.uppercased()) {
-                newWatchlist.append(WatchListItem(ticker: watchlistItem.ticker))
+        var oldWatchList = self.getWatchlist()
+        for (index, element) in oldWatchList.enumerated() { //iterate old watchlist and create new list without the input ticker stock
+            if (element.ticker.uppercased() != inputTicker.uppercased()) {
+                oldWatchList.remove(at:index)
+                break
             }
         }
         //update the local storage with the newly created watchlist
-        self.watchList = newWatchlist
-        if let encoded = try? JSONEncoder().encode(newWatchlist) {
+
+        if let encoded = try? JSONEncoder().encode(oldWatchList) {
             UserDefaults.standard.set(encoded, forKey: "watchlistItems")
             print("deleteWatchlistItem ", String(data: encoded, encoding: .utf8)!)
         }
@@ -205,7 +205,7 @@ class Storageservice {
         //iterate existing portoflio
    
         for(_, element) in oldPortfolioList.enumerated() {
-            if(element.ticker == inputTicker) {
+            if(element.ticker.uppercased() == inputTicker.uppercased()) {
                 res = element.numShares
                 break
             }
@@ -214,15 +214,13 @@ class Storageservice {
     }
     
     func isFavored(_ inputTicker: String)->Bool {
-        var res = false
         let watchlist = self.getWatchlist()
         for item in watchlist {
-            if (item.ticker == inputTicker) {
-                res = true
-                break
+            if (item.ticker.uppercased() == inputTicker.uppercased()) {
+                return true
             }
         }
-        return res
+        return false
     }
     
     
