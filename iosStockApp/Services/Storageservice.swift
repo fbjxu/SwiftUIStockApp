@@ -89,7 +89,7 @@ class Storageservice {
         }
     }
     
-    func buyStock(_ inputTicker: String, _ numShares: Double,  _ listVM: StockListViewModel) {
+    func buyStock(_ inputTicker: String, _ numShares: Double,  _ price: Double, _ listVM: StockListViewModel) {
         var oldPortfolioList = self.getPortfolio()
         //if the list contains the ticker
         for(index, element) in oldPortfolioList.enumerated() {
@@ -106,6 +106,8 @@ class Storageservice {
                     UserDefaults.standard.set(encoded, forKey: "portfolioItems") //update local storage
                     print("buyStock ", String(data: encoded, encoding: .utf8)!) //debug
                 }
+                listVM.cash -= price * numShares
+                listVM.getNetworth()
                 return
             }
         }
@@ -117,10 +119,12 @@ class Storageservice {
             UserDefaults.standard.set(encoded, forKey: "portfolioItems") //update local storage
             print("buyStock ", String(data: encoded, encoding: .utf8)!) //debug
         }
+        listVM.cash -= price * numShares
+        listVM.getNetworth()
         return        
     }
     
-    func sellStock(_ inputTicker: String, _ numShares: Double,  _ listVM: StockListViewModel) {
+    func sellStock(_ inputTicker: String, _ numShares: Double, _ price: Double, _ listVM: StockListViewModel) {
         var oldPortfolioList = self.getPortfolio()
         //iterate existing portoflio
    
@@ -138,6 +142,8 @@ class Storageservice {
                         UserDefaults.standard.set(encoded, forKey: "portfolioItems") //update local storage
                         print("sellStock ", String(data: encoded, encoding: .utf8)!) //debug
                     }
+                    listVM.cash += price * numShares
+                    listVM.getNetworth()
                     return
                 }
                 oldPortfolioList[index] = updatePortfolioEntry //update existing portfolio list
@@ -148,6 +154,8 @@ class Storageservice {
                     UserDefaults.standard.set(encoded, forKey: "portfolioItems") //update local storage
                     print("sellStock ", String(data: encoded, encoding: .utf8)!) //debug
                 }
+                listVM.cash += price * numShares
+                listVM.getNetworth()
                 return
             }
         }

@@ -111,13 +111,13 @@ struct TradeView: View {
                             .font(.body)
                     }
                     Spacer()
-                    Text("$3000 available to buy \(self.stockTicker)")
+                    Text("$\(String(format: "%.2f", self.listVM.networth)) available to buy \(self.stockTicker)")
                         .font(.body)
                         .foregroundColor(.gray)
                     HStack{
                         Button(action: {
                             //action
-                            Storageservice().buyStock(self.stockTicker, Double(self.numShares)!, self.listVM)
+                            Storageservice().buyStock(self.stockTicker, Double(self.numShares)!, self.detailVM.stockPriceSummaryInfo.last, self.listVM)
                             self.isBuy = true
                             self.showingSuccessView.toggle()
                         }) {
@@ -134,7 +134,7 @@ struct TradeView: View {
                         Button(action: {
                             //action
                             self.isBuy = false
-                            Storageservice().sellStock(self.stockTicker, Double(self.numShares)!, self.listVM)
+                            Storageservice().sellStock(self.stockTicker, Double(self.numShares)!, self.detailVM.stockPriceSummaryInfo.last, self.listVM)
                             self.showingSuccessView.toggle()
                         }) {
                             ZStack {

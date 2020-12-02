@@ -58,7 +58,7 @@ struct StockListView: View {
                     }
                     
                     
-                    //stock
+                    //Date
                     if(self.searchBar.text.isEmpty) {
                         VStack (alignment: .leading) {
                             Text("\(self.today)")
@@ -82,6 +82,13 @@ struct StockListView: View {
                             }
                         }
                         Section(header: Text("PORTFOLIO")) {
+                            VStack{
+                                Text("Net Worth")
+                                    .font(.title)
+                                Text("\(String(format: "%.2f", self.listVM.networth))")
+                                    .font(.title)
+                                    .bold()
+                            }
                             ForEach(self.listVM.portfolioItems, id: \.ticker) { stock in
                                 HStack {
                                     

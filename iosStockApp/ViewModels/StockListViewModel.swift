@@ -11,7 +11,8 @@ class StockListViewModel: ObservableObject {
     @Published public var stocks: [StockViewModel] = [StockViewModel]()
     @Published public var portfolioItems: [StockViewModel] = [StockViewModel]()
     @Published public var cash: Double = 20000
-    @Published public var loaded: Bool = false;
+    @Published public var networth: Double = 0
+    @Published public var loaded: Bool = false
     
     
     //called when init the StockListView
@@ -32,6 +33,7 @@ class StockListViewModel: ObservableObject {
         }
         
         myGroup.notify(queue: .main) {
+            self.getNetworth()
             self.loaded = true
             print("Finished all requests.")
         }
@@ -39,5 +41,13 @@ class StockListViewModel: ObservableObject {
     
     func refresh() {
         Webservice().refreshPriceSummary(self)
+    }
+    
+    func getNetworth(){
+        var positionVal: Double = 0.0
+        for position in self.portfolioItems {
+            positionVal += position.stock.price * position.stock.numShares
+        }
+        self.networth = self.cash + positionVal
     }
 }
