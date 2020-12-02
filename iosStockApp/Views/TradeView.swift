@@ -12,6 +12,7 @@ struct successView: View {
     @Environment(\.presentationMode) var presentationMode
     var isBuy: Bool = true
     var stockName: String = ""
+    var numShares: String = ""
     
         
     var body: some View {
@@ -27,12 +28,12 @@ struct successView: View {
                         .foregroundColor(.white)
                         .padding(.vertical, 10)
                     if(isBuy) {
-                        Text("You have successfully bought 1 share of \(self.stockName)")
+                        Text("You have successfully bought \(self.numShares) share of \(self.stockName)")
                             .foregroundColor(.white)
                             .font(.body)
                     }
                     else {
-                        Text("You have successfully sold 1 share of \(self.stockName)")
+                        Text("You have successfully sold \(self.numShares) share of \(self.stockName)")
                             .foregroundColor(.white)
                             .font(.body)
                     }
@@ -88,7 +89,7 @@ struct TradeView: View {
     
     var body: some View {
         if(showingSuccessView) {
-            successView(isBuy: self.isBuy, stockName: self.stockName)
+            successView(isBuy: self.isBuy, stockName: self.stockName, numShares: self.numShares)
         } else {
             NavigationView{
                 VStack{

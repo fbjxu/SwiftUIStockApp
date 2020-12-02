@@ -16,10 +16,14 @@ struct PortfolioItem: Codable {
     var numShares: Double
 }
 
+struct Cash: Codable {
+    var cash: Double
+}
 //Storageservice stores the portfolioList and watchList along with their helper methods
 class Storageservice {
     var portfolioList: [PortfolioItem]
     var watchList: [WatchListItem]
+    var storedCash: Cash
     
     init() {
         //testing version
@@ -36,35 +40,75 @@ class Storageservice {
             
             let storedPortfolioObjs = UserDefaults.standard.object(forKey: "portfolioItems")
             let storedWatchlistObjs = UserDefaults.standard.object(forKey: "watchlistItems")
+            let storedCashObj = UserDefaults.standard.object(forKey: "cash")
+            
             var storedPortfolioItems = [PortfolioItem]() //init stored Portfolio Items
             var storedWatchlistItems = [WatchListItem]() //init stored Watchlist Items
+            storedCash = Cash(cash: 20000) //init cash
             portfolioList = []
             watchList = [] //hard code
             /*************** Reset local storage *****************/
+            //TODO: remove
 //            if let encoded = try? JSONEncoder().encode(watchList) {
 //                UserDefaults.standard.set(encoded, forKey: "watchlistItems")
 //            }
 //            if let portfolioEncoded = try? JSONEncoder().encode(portfolioList) {
 //                UserDefaults.standard.set(portfolioEncoded, forKey: "portfolioItems")
 //            }
+//            
+//            if let cashEncoded = try? JSONEncoder().encode(storedCash) {
+//                UserDefaults.standard.set(cashEncoded, forKey: "cash")
+//            }
             
-            /*************** Reset local storage *****************/
-            
-            if (storedPortfolioObjs != nil) {
+            /*************** set up local storage *****************/
+            if (storedPortfolioObjs != nil) { //local storage already exists
                 storedPortfolioItems = try JSONDecoder().decode([PortfolioItem].self, from: storedPortfolioObjs as! Data)
+            } else {//no local storage -> set it up
+                if let portfolioEncoded = try? JSONEncoder().encode(portfolioList) {
+                    UserDefaults.standard.set(portfolioEncoded, forKey: "portfolioItems")
+                }
             }
 
-            if (storedWatchlistObjs != nil) {
+            if (storedWatchlistObjs != nil) { //local storage already exists
                 storedWatchlistItems = try JSONDecoder().decode([WatchListItem].self, from: storedWatchlistObjs as! Data)
+            } else {//no local storage -> set it up
+                if let encoded = try? JSONEncoder().encode(watchList) {
+                    UserDefaults.standard.set(encoded, forKey: "watchlistItems")
+                }
             }
-            print("Init: Retrieved items: \(storedPortfolioItems)")
-            print("Init: Retrieved items: \(storedWatchlistItems)")
+            
+            if (storedCashObj != nil) {//local storage already exists
+                storedCash = try JSONDecoder().decode(Cash.self, from: storedCashObj as! Data)
+            } else {//no local storage -> set it up
+                if let cashEncoded = try? JSONEncoder().encode(storedCash) {
+                    UserDefaults.standard.set(cashEncoded, forKey: "cash")
+                }
+            }
+            
+            print("Init: Retrieved PortfolioList items: \(storedPortfolioItems)")
+            print("Init: Retrieved Watchlist items: \(storedWatchlistItems)")
+            print("Init: Retrieved cash: \(storedCash)")
             self.portfolioList = storedPortfolioItems
             self.watchList = storedWatchlistItems
         } catch let err {
             self.portfolioList = []
             self.watchList = []
             print(err)
+        }
+    }
+    
+    func getCash() -> Cash {
+        do {
+            let storedcCashObj = UserDefaults.standard.object(forKey: "cash")
+            var cash = Cash(cash:20000)
+            if (storedcCashObj != nil) {
+                cash = try JSONDecoder().decode(Cash.self, from: storedcCashObj as! Data)
+            }
+            print("Retrieved cash: \(cash)")
+            return cash
+        } catch let err {
+            print(err)
+            return Cash(cash:20000)
         }
     }
     
@@ -104,6 +148,7 @@ class Storageservice {
     
     func buyStock(_ inputTicker: String, _ numShares: Double,  _ price: Double, _ listVM: StockListViewModel) {
         var oldPortfolioList = self.getPortfolio()
+        let oldCash = self.getCash().cash
         //if the list contains the ticker
         for(index, element) in oldPortfolioList.enumerated() {
             if (element.ticker.uppercased() == inputTicker.uppercased()) {
@@ -117,6 +162,9 @@ class Storageservice {
                     Webservice().updateTickerAPI(inputTicker, listVM, true, numShares) //update the list and ask for the latest stock price
                     Webservice().updateTickerAPI(inputTicker, listVM, false, numShares) //update watchlist; this method is soft: only update when the item in list
                     UserDefaults.standard.set(encoded, forKey: "portfolioItems") //update local storage
+                    if let encodedCash = try? JSONEncoder().encode(Cash(cash: oldCash-price * numShares)) {
+                        UserDefaults.standard.set(encodedCash, forKey: "cash")//update local storage cash
+                    }
                     print("buyStock ", String(data: encoded, encoding: .utf8)!) //debug
                 }
                 listVM.cash -= price * numShares
@@ -130,6 +178,9 @@ class Storageservice {
         if let encoded = try? JSONEncoder().encode(oldPortfolioList) {
             Webservice().addTickerAPI(inputTicker, listVM, true, numShares) //add this new ticker and ask for the latest stock price
             UserDefaults.standard.set(encoded, forKey: "portfolioItems") //update local storage
+            if let encodedCash = try? JSONEncoder().encode(Cash(cash: oldCash-price * numShares)) {
+                UserDefaults.standard.set(encodedCash, forKey: "cash")//update local storage cash
+            }
             print("buyStock ", String(data: encoded, encoding: .utf8)!) //debug
         }
         listVM.cash -= price * numShares
@@ -139,6 +190,7 @@ class Storageservice {
     
     func sellStock(_ inputTicker: String, _ numShares: Double, _ price: Double, _ listVM: StockListViewModel) {
         var oldPortfolioList = self.getPortfolio()
+        let oldCash = self.getCash().cash
         //iterate existing portoflio
    
         for(index, element) in oldPortfolioList.enumerated() {
@@ -153,6 +205,9 @@ class Storageservice {
                         Webservice().updateTickerAPI(inputTicker, listVM, true, -numShares) //update the list and ask for the latest stock price
                         Webservice().updateTickerAPI(inputTicker, listVM, false, -numShares) //update watchlist; this method is soft: only update when the item in list
                         UserDefaults.standard.set(encoded, forKey: "portfolioItems") //update local storage
+                        if let encodedCash = try? JSONEncoder().encode(Cash(cash: oldCash-price * numShares)) {
+                            UserDefaults.standard.set(encodedCash, forKey: "cash")//update local storage cash
+                        }
                         print("sellStock ", String(data: encoded, encoding: .utf8)!) //debug
                     }
                     listVM.cash += price * numShares
@@ -165,6 +220,9 @@ class Storageservice {
                     Webservice().updateTickerAPI(inputTicker, listVM, true, -numShares) //update the list and ask for the latest stock price
                     Webservice().updateTickerAPI(inputTicker, listVM, false, -numShares) //update watchlist; this method is soft: only update when the item in list
                     UserDefaults.standard.set(encoded, forKey: "portfolioItems") //update local storage
+                    if let encodedCash = try? JSONEncoder().encode(Cash(cash: oldCash-price * numShares)) {
+                        UserDefaults.standard.set(encodedCash, forKey: "cash")//update local storage cash
+                    }
                     print("sellStock ", String(data: encoded, encoding: .utf8)!) //debug
                 }
                 listVM.cash += price * numShares

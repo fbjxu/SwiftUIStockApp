@@ -10,7 +10,7 @@ import Foundation
 class StockListViewModel: ObservableObject {
     @Published public var stocks: [StockViewModel] = [StockViewModel]()
     @Published public var portfolioItems: [StockViewModel] = [StockViewModel]()
-    @Published public var cash: Double = 20000
+    @Published public var cash: Double = 0
     @Published public var networth: Double = 0
     @Published public var loaded: Bool = false
     
@@ -20,6 +20,7 @@ class StockListViewModel: ObservableObject {
         let localStorage = Storageservice()
         let webService = Webservice()
         let tickers = localStorage.getWatchlist() //get existing tickers stored in local watchlist
+        self.cash = localStorage.getCash().cash
         self.stocks = []
         let portfolioTickers = localStorage.getPortfolio()
         self.portfolioItems = []
