@@ -48,7 +48,8 @@ class Webservice {
     func getNews(_ ticker: String, _ detailVM: DetailViewModel, _ group: DispatchGroup = DispatchGroup()) {
         group.enter()
         print("called get news")
-//        return
+//        group.leave() //TODO: remove
+//        return//TODO: remove
         let url = "http://angularfinance-env.eba-m6bbnkf3.us-east-1.elasticbeanstalk.com/api/news/"+ticker //unique URL
         AF.request(url).validate().responseData{ (response) in
             if(response.data == nil) {
@@ -63,7 +64,9 @@ class Webservice {
 //                print("title:", subJson["title"])
 //                print("source: ", subJson["source"]["name"])
 //                print("time: ", subJson["publishedAt"])
-                let newsPiece = NewsItem(id: i, source: subJson["source"]["name"].stringValue, title: subJson["title"].stringValue, url: subJson["url"].stringValue, urlToImage: subJson["urlToImage"].stringValue, publishedAt: subJson["publishedAt"].stringValue)
+                
+                let dateString = self.parseDate(subJson["publishedAt"].stringValue)
+                let newsPiece = NewsItem(id: i, source: subJson["source"]["name"].stringValue, title: subJson["title"].stringValue, url: subJson["url"].stringValue, urlToImage: subJson["urlToImage"].stringValue, publishedAt: dateString)
                 updatedNews.append(newsPiece)
                 i += 1
    
@@ -73,7 +76,31 @@ class Webservice {
         }
     }
     
-    
+    func parseDate(_ inputDate: String) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss'Z'"
+        let convertedDate = formatter.date(from: inputDate)?.addingTimeInterval(-28800) ?? Date() //get article time
+        let today = Date()
+        var diffComponents = Calendar.current.dateComponents([.hour], from: convertedDate, to: today)
+        print("today date" + formatter.string(from: today))
+        print("news date" + formatter.string(from: convertedDate))
+        let hours = diffComponents.hour ?? 0
+        if(hours > 24) { //if more than 24 hours
+            diffComponents = Calendar.current.dateComponents([.day], from: convertedDate, to: today)
+            let days = diffComponents.day ?? 0
+            if (hours > 48 ) {
+                return String(days) + " days ago"
+            }
+            return String(days) + " day ago"
+        }
+        if(hours > 1) {
+            return String(hours) + " hours ago"
+        }
+        
+        diffComponents = Calendar.current.dateComponents([.minute], from: convertedDate, to: today)
+        let minutes = diffComponents.minute ?? 0
+        return String(minutes) + " minutes ago"
+    }
     
     //addTickerAPI adds the input ticker to the passed in StockListVM and update its price via REST
     func addTickerAPI(_ ticker: String, _ stockListVM: StockListViewModel, _ portfolioOption: Bool = false, _ numShares: Double = 0, _ group: DispatchGroup = DispatchGroup()) {

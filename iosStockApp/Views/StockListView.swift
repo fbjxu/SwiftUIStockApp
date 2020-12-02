@@ -66,21 +66,22 @@ struct StockListView: View {
                                 .fontWeight(.bold)
                                 .foregroundColor(Color.gray)
                         }
-                        Section(header: Text("Input Stock")) {
-                            HStack{
-                                TextField("New Item", text: self.$newStock)
-                                Button(action: {
-                                    //update StockListVM
-                                    Storageservice().addWatchlistItem(self.newStock, self.listVM)
-                                    //reset input
-                                    self.newStock=""
-                                }) {
-                                    Image(systemName: "plus.circle.fill")
-                                        .foregroundColor(.green)
-                                        .imageScale(.large)
-                                }
-                            }
-                        }
+                        /******************TEST ONLY*********/
+//                        Section(header: Text("Input Stock")) {
+//                            HStack{
+//                                TextField("New Item", text: self.$newStock)
+//                                Button(action: {
+//                                    //update StockListVM
+//                                    Storageservice().addWatchlistItem(self.newStock, self.listVM)
+//                                    //reset input
+//                                    self.newStock=""
+//                                }) {
+//                                    Image(systemName: "plus.circle.fill")
+//                                        .foregroundColor(.green)
+//                                        .imageScale(.large)
+//                                }
+//                            }
+//                        }
                         Section(header: Text("PORTFOLIO")) {
                             VStack{
                                 Text("Net Worth")
@@ -137,7 +138,7 @@ struct StockListView: View {
                                 
                             }
                             .onMove{ (indexSet, index) in
-                                listVM.stocks.move(fromOffsets: indexSet, toOffset: index)
+                                listVM.portfolioItems.move(fromOffsets: indexSet, toOffset: index)
                             }
                         }
                         
@@ -199,7 +200,7 @@ struct StockListView: View {
                             .onDelete{ indexSet in
                                 let deleteItem = self.listVM.stocks[indexSet.first!]
                                 Storageservice().removeWatchlistItem(deleteItem.ticker, self.listVM)
-                                listVM.stocks.remove(atOffsets: indexSet)
+//                                listVM.stocks.remove(atOffsets: indexSet)
                             }
                             .onMove{ (indexSet, index) in
                                 listVM.stocks.move(fromOffsets: indexSet, toOffset: index)

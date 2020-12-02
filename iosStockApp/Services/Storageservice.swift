@@ -23,43 +23,56 @@ class Storageservice {
     
     init() {
         //testing version
-        portfolioList = [PortfolioItem(ticker: "AAPL", numShares: 10),PortfolioItem(ticker: "GOOGL", numShares: 12),PortfolioItem(ticker: "TSLA", numShares: 5)]
-        watchList = [WatchListItem(ticker: "AAPL"), WatchListItem(ticker: "GOOGL"), WatchListItem(ticker: "AMZN"), WatchListItem(ticker: "FB")] //hard code
-        if let encoded = try? JSONEncoder().encode(watchList) {
-            UserDefaults.standard.set(encoded, forKey: "watchlistItems")
-        }
-        if let portfolioEncoded = try? JSONEncoder().encode(portfolioList) {
-            UserDefaults.standard.set(portfolioEncoded, forKey: "portfolioItems")
-        }
-        //production version
-//        do {
-//            let storedPortfolioObjs = UserDefaults.standard.object(forKey: "portfolioItems")
-//            let storedWatchlistObjs = UserDefaults.standard.object(forKey: "watchlistItems")
-//            var storedPortfolioItems = [PortfolioItem]() //init stored Portfolio Items
-//            var storedWatchlistItems = [WatchListItem]() //init stored Watchlist Items
-//            if (storedPortfolioObjs != nil) {
-//                storedPortfolioItems = try JSONDecoder().decode([PortfolioItem].self, from: storedPortfolioObjs as! Data)
-//            }
-//
-//            if (storedWatchlistObjs != nil) {
-//                storedWatchlistItems = try JSONDecoder().decode([WatchListItem].self, from: storedWatchlistObjs as! Data)
-//            }
-//            print("Init: Retrieved items: \(storedPortfolioItems)")
-//            print("Init: Retrieved items: \(storedWatchlistItems)")
-//            self.portfolioList = storedPortfolioItems
-//            self.watchList = storedWatchlistItems
-//        } catch let err {
-//            self.portfolioList = []
-//            self.watchList = []
-//            print(err)
+//        portfolioList = [PortfolioItem(ticker: "AAPL", numShares: 10),PortfolioItem(ticker: "GOOGL", numShares: 12),PortfolioItem(ticker: "TSLA", numShares: 5)]
+//        watchList = [WatchListItem(ticker: "AAPL"), WatchListItem(ticker: "GOOGL"), WatchListItem(ticker: "AMZN"), WatchListItem(ticker: "FB")] //hard code
+//        if let encoded = try? JSONEncoder().encode(watchList) {
+//            UserDefaults.standard.set(encoded, forKey: "watchlistItems")
 //        }
+//        if let portfolioEncoded = try? JSONEncoder().encode(portfolioList) {
+//            UserDefaults.standard.set(portfolioEncoded, forKey: "portfolioItems")
+//        }
+        //production version
+        do {
+            
+            let storedPortfolioObjs = UserDefaults.standard.object(forKey: "portfolioItems")
+            let storedWatchlistObjs = UserDefaults.standard.object(forKey: "watchlistItems")
+            var storedPortfolioItems = [PortfolioItem]() //init stored Portfolio Items
+            var storedWatchlistItems = [WatchListItem]() //init stored Watchlist Items
+            portfolioList = []
+            watchList = [] //hard code
+            /*************** Reset local storage *****************/
+//            if let encoded = try? JSONEncoder().encode(watchList) {
+//                UserDefaults.standard.set(encoded, forKey: "watchlistItems")
+//            }
+//            if let portfolioEncoded = try? JSONEncoder().encode(portfolioList) {
+//                UserDefaults.standard.set(portfolioEncoded, forKey: "portfolioItems")
+//            }
+            
+            /*************** Reset local storage *****************/
+            
+            if (storedPortfolioObjs != nil) {
+                storedPortfolioItems = try JSONDecoder().decode([PortfolioItem].self, from: storedPortfolioObjs as! Data)
+            }
+
+            if (storedWatchlistObjs != nil) {
+                storedWatchlistItems = try JSONDecoder().decode([WatchListItem].self, from: storedWatchlistObjs as! Data)
+            }
+            print("Init: Retrieved items: \(storedPortfolioItems)")
+            print("Init: Retrieved items: \(storedWatchlistItems)")
+            self.portfolioList = storedPortfolioItems
+            self.watchList = storedWatchlistItems
+        } catch let err {
+            self.portfolioList = []
+            self.watchList = []
+            print(err)
+        }
     }
     
     func getPortfolio() -> [PortfolioItem] {
         //get existing local storage of the portfolio
         do {
             let storedPortfolioObjs = UserDefaults.standard.object(forKey: "portfolioItems")
-            var storedPortfolioItems = [PortfolioItem]()
+            var storedPortfolioItems: [PortfolioItem] = []
             if (storedPortfolioObjs != nil) {
                 storedPortfolioItems = try JSONDecoder().decode([PortfolioItem].self, from: storedPortfolioObjs as! Data)
             }
@@ -75,7 +88,7 @@ class Storageservice {
         //get existing local storage of the portfolio
         do {
             let storedWatchlistObjs = UserDefaults.standard.object(forKey: "watchlistItems")
-            var storedWatchlistItems = [WatchListItem]()
+            var storedWatchlistItems: [WatchListItem] = []
             if (storedWatchlistObjs != nil) {
                 storedWatchlistItems = try JSONDecoder().decode([WatchListItem].self, from: storedWatchlistObjs as! Data)
             }
@@ -186,12 +199,11 @@ class Storageservice {
         //update local storage
         var oldWatchList = self.getWatchlist()
         for (index, element) in oldWatchList.enumerated() { //iterate old watchlist and create new list without the input ticker stock
-            if (element.ticker.uppercased() != inputTicker.uppercased()) {
+            if (element.ticker.uppercased() == inputTicker.uppercased()) {
                 oldWatchList.remove(at:index)
                 break
             }
         }
-        //update the local storage with the newly created watchlist
 
         if let encoded = try? JSONEncoder().encode(oldWatchList) {
             UserDefaults.standard.set(encoded, forKey: "watchlistItems")

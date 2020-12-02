@@ -71,6 +71,8 @@ struct TradeView: View {
     @ObservedObject var listVM: StockListViewModel //from parent
     @ObservedObject var detailVM: DetailViewModel //from parent
     @State private var isBuy = false
+    @State var showToast: Bool = false
+    @State var errorMsg: String = ""
     
     var stockTicker:String //from parent
     var stockName: String //from parent
@@ -81,6 +83,7 @@ struct TradeView: View {
         self.detailVM = detailVM
         self.stockTicker = inputTicker
         self.stockName = inputName
+        self.showToast = false
     }
     
     var body: some View {
@@ -111,15 +114,28 @@ struct TradeView: View {
                             .font(.body)
                     }
                     Spacer()
-                    Text("$\(String(format: "%.2f", self.listVM.networth)) available to buy \(self.stockTicker)")
+                    Text("$\(String(format: "%.2f", self.listVM.cash)) available to buy \(self.stockTicker)")
                         .font(.body)
                         .foregroundColor(.gray)
+                        .offset(y:-20)
                     HStack{
                         Button(action: {
                             //action
-                            Storageservice().buyStock(self.stockTicker, Double(self.numShares)!, self.detailVM.stockPriceSummaryInfo.last, self.listVM)
-                            self.isBuy = true
-                            self.showingSuccessView.toggle()
+                            let msgOutput = checkBuy()
+                            if(msgOutput == "") {
+                                Storageservice().buyStock(self.stockTicker, Double(self.numShares)!, self.detailVM.stockPriceSummaryInfo.last, self.listVM)
+                                self.isBuy = true
+                                self.showingSuccessView.toggle()
+                            } else {
+                                self.errorMsg = msgOutput
+                                self.showToast = true
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                                  withAnimation {
+                                    self.showToast = false
+                                  }
+                                }
+                                
+                            }
                         }) {
                             ZStack {
                                 RoundedRectangle(cornerRadius: 25)
@@ -133,9 +149,21 @@ struct TradeView: View {
                         
                         Button(action: {
                             //action
-                            self.isBuy = false
-                            Storageservice().sellStock(self.stockTicker, Double(self.numShares)!, self.detailVM.stockPriceSummaryInfo.last, self.listVM)
-                            self.showingSuccessView.toggle()
+                            let msgOutput = checkSell()
+                            if(msgOutput == "") {
+                                self.isBuy = false
+                                Storageservice().sellStock(self.stockTicker, Double(self.numShares)!, self.detailVM.stockPriceSummaryInfo.last, self.listVM)
+                                self.showingSuccessView.toggle()
+                            } else {
+                                self.errorMsg = msgOutput
+                                self.showToast = true
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                                  withAnimation {
+                                    self.showToast = false
+                                  }
+                                }
+                            }
+                            
                         }) {
                             ZStack {
                                 RoundedRectangle(cornerRadius: 25)
@@ -147,6 +175,7 @@ struct TradeView: View {
                             }
                         }
                     }
+                    .offset(y:-20)
                     
                 }
                 .navigationBarItems(leading: Button(action:{
@@ -157,11 +186,45 @@ struct TradeView: View {
 
             }
             .padding(.horizontal, 10)
+            .toast(isShowing: self.$showToast, text: Text(self.errorMsg))
         }
         
         
     }
+    
+    func checkBuy() ->String {
+        if (Double(self.numShares) == nil) {
+            return "Please enter a valid amount"
+        } else {
+            let spending = self.detailVM.stockPriceSummaryInfo.last * (Double(self.numShares) ?? 0)
+            if(self.listVM.cash < spending) {
+                return "Not enough money to buy"
+            }
+            if((Double(self.numShares)!)<=0) {
+                return "Cannot buy less than 0 share"
+            }
+            return ""
+        }
+    }
+    
+    func checkSell() ->String {
+        if (Double(self.numShares) == nil) {
+            return "Please enter a valid amount"
+        } else {
+            let ownedShares = Storageservice().getNumShares(self.stockTicker)
+            let sellShares = Double(self.numShares) ?? 0
+            if(ownedShares < sellShares) {
+                return "Not enough shares to sell"
+            }
+            if((Double(self.numShares)!)<=0) {
+                return "Cannot sell less than 0 share"
+            }
+            return ""
+        }
+    }
+
 }
+
 
 
 struct Trade_Previews: PreviewProvider {
