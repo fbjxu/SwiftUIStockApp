@@ -59,7 +59,7 @@ class Storageservice {
 //            if let cashEncoded = try? JSONEncoder().encode(storedCash) {
 //                UserDefaults.standard.set(cashEncoded, forKey: "cash")
 //            }
-            
+//            
             /*************** set up local storage *****************/
             if (storedPortfolioObjs != nil) { //local storage already exists
                 storedPortfolioItems = try JSONDecoder().decode([PortfolioItem].self, from: storedPortfolioObjs as! Data)
