@@ -26,7 +26,9 @@ class Webservice {
                                     low: stockPriceInfo[0]["low"].doubleValue,
                                     bidPrice: stockPriceInfo[0]["bidPrice"].doubleValue,
                                     open: stockPriceInfo[0]["open"].doubleValue,
-                                    mid: stockPriceInfo[0]["mid"].doubleValue)
+                                    mid: stockPriceInfo[0]["mid"].doubleValue,
+                                    high: stockPriceInfo[0]["high"].doubleValue,
+                                    volume: stockPriceInfo[0]["volume"].doubleValue)
             detailVM.stockPriceSummaryInfo = stock
             group.leave()
         }
@@ -50,7 +52,7 @@ class Webservice {
         print("called get news")
         group.leave() //TODO: remove
         return//TODO: remove
-        let url = "http://angularfinance-env.eba-m6bbnkf3.us-east-1.elasticbeanstalk.com/api/news/"+ticker //unique URL
+        let url = "http://stockappchart-env.eba-xpd25bx3.us-east-2.elasticbeanstalk.com/api/news/"+ticker //unique URL
         AF.request(url).validate().responseData{ (response) in
             if(response.data == nil) {
                 return

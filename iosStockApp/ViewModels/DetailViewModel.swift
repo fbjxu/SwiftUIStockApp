@@ -8,7 +8,7 @@
 import Foundation
 
 class DetailViewModel: ObservableObject {
-    @Published public var stockPriceSummaryInfo: PriceSummaryItem = PriceSummaryItem(ticker: "", last: 0, change: 0, low: 0, bidPrice: 0, open: 0, mid: 0)
+    @Published public var stockPriceSummaryInfo: PriceSummaryItem = PriceSummaryItem(ticker: "", last: 0, change: 0, low: 0, bidPrice: 0, open: 0, mid: 0, high:0, volume:0)
     @Published public var stockNews: [NewsItem] = [NewsItem]()
     @Published public var stockAboutInfo: String = ""
     @Published public var detailLoaded = false
@@ -55,4 +55,17 @@ class DetailViewModel: ObservableObject {
     func getMid() -> String {
         return String(format: "%.2f", self.stockPriceSummaryInfo.mid)
     }
+    
+    func getHigh() -> String {
+        return String(format: "%.2f", self.stockPriceSummaryInfo.high)
+    }
+    
+    func getVolume() -> String {
+        let largeNumber = self.stockPriceSummaryInfo.volume
+        let numberFormatter = NumberFormatter()
+        numberFormatter.numberStyle = .decimal
+        let formattedNumber = numberFormatter.string(from: NSNumber(value:largeNumber))
+        return String(formattedNumber ?? "0")
+    }
+    
 }

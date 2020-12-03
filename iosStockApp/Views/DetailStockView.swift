@@ -25,7 +25,7 @@ struct DetailStockView: View {
         GridItem(.flexible(), alignment: .leading),
         GridItem(.flexible(), alignment: .leading)
     ]
-    private var threeColumnGrid = [GridItem(.flexible()), GridItem(.flexible())]
+    private var threeColumnGrid = [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())]
     
     @State private var aboutExpand: Bool = false
     
@@ -143,34 +143,56 @@ struct DetailStockView: View {
                                     .font(.title)
                                     .padding(.vertical, 8)
                                 ScrollView(.horizontal) {
-                                    LazyHGrid(rows: threeColumnGrid) {
+                                    LazyHGrid(rows: threeColumnGrid, alignment: .bottom) {
                                         
-                                        Text("Current Price: " + self.detailVM.getLast())
-                                            .font(.body)
+                                        HStack{
+                                            Text("Current Price: " + self.detailVM.getLast())
+                                                .font(.body)
+                                            Spacer()
+                                                .frame(width: 30)
+                                        }
+   
+                                        HStack{
+                                            Text("Open Price: " + self.detailVM.getOpen())
+                                                .font(.body)
+                                                .multilineTextAlignment(.leading)
+                                            Spacer()
+                                            
+                                        }
                                         
+                                            
+                                        HStack{
+                                            Text("High: " + self.detailVM.getHigh())
+                                                .font(.body)
+                                            Spacer()
+                                        }
                                         
+                                        HStack{
+                                            Text("Low: " + self.detailVM.getLow())
+                                                .font(.body)
+                                            Spacer()
+                                        }
                                         
-                                        Text("Open Price: " + self.detailVM.getOpen())
-                                            .font(.body)
-                                            .multilineTextAlignment(.leading)
-                                            .padding(.leading, -18.0)
-                                        
-                                        
-                                        Text("Low: " + self.detailVM.getLow())
-                                            .font(.body)
-                                        
-                                        Text("Mid: " + self.detailVM.getMid())
-                                            .font(.body)
-                                            .padding(.leading, -18.0)
-                                            .offset(x:10)
-                                        
-                                        Text("Bid Price: " + self.detailVM.getBidPrice())
-                                            .font(.body)
+                                        HStack{
+                                            Text("Mid: " + self.detailVM.getMid())
+                                                .font(.body)
+                                            Spacer()
+                                        }
+                                        HStack{
+                                            Text("Volume: " + self.detailVM.getVolume())
+                                                .font(.body)
+                                            Spacer()
+                                        }
+                                        HStack{
+                                            Text("Bid Price: " + self.detailVM.getBidPrice())
+                                                .font(.body)
+                                            Spacer()
+                                        }
                                     }
                                     
                                     
                                 }
-                                //                            .frame(maxHeight:100)
+                                .frame(minHeight:75)
                                 
                             }
                             //                        .padding(.horizontal, 10)

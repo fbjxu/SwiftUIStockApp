@@ -15,5 +15,7 @@ struct PriceSummaryItem {
     var bidPrice: Double
     var open: Double
     var mid: Double
+    var high: Double
+    var volume: Double
     
 }
