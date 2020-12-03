@@ -48,8 +48,8 @@ class Webservice {
     func getNews(_ ticker: String, _ detailVM: DetailViewModel, _ group: DispatchGroup = DispatchGroup()) {
         group.enter()
         print("called get news")
-//        group.leave() //TODO: remove
-//        return//TODO: remove
+        group.leave() //TODO: remove
+        return//TODO: remove
         let url = "http://angularfinance-env.eba-m6bbnkf3.us-east-1.elasticbeanstalk.com/api/news/"+ticker //unique URL
         AF.request(url).validate().responseData{ (response) in
             if(response.data == nil) {
@@ -127,11 +127,22 @@ class Webservice {
             
             if portfolioOption {
                 stockListVM.portfolioItems.append(StockViewModel(stock))
+                for (index,stockVM) in stockListVM.stocks.enumerated() {//get current stock from stockListVM
+                    if(stockVM.ticker == ticker) {
+                        let newWatchStock = stockListVM.stocks[index].stock //get current stock from stockListVM
+                        newWatchStock.price = stock.price
+                        newWatchStock.change = stock.change
+                        newWatchStock.numShares = stock.numShares
+                        stockListVM.stocks[index].stock = newWatchStock
+                        break
+                    }
+                }
             }
             else {
                 stockListVM.stocks.append(StockViewModel(stock))
             }
             print("addTickerAPI")
+            stockListVM.getNetworth()
             group.leave()
             print("left group for \(ticker)")
         }
@@ -154,10 +165,34 @@ class Webservice {
                         newstock.numShares += numShares
                         if(newstock.numShares == 0) {
                             stockListVM.portfolioItems.remove(at:index)
+                            stockListVM.getNetworth()
                             print("updateTickerPrice for portfolio: removed emptied positions")
+                            for (index,stockVM) in stockListVM.stocks.enumerated() {
+                                if(stockVM.ticker == ticker) {
+                                    let newWatchStock = stockListVM.stocks[index].stock //get current stock from stockListVM
+                                    newWatchStock.price = stockPriceInfo[0]["last"].doubleValue
+                                    newWatchStock.change = stockPriceInfo[0]["last"].doubleValue - stockPriceInfo[0]["prevClose"].doubleValue
+                                    newWatchStock.numShares = 0
+                                    stockListVM.stocks[index].stock = newWatchStock
+                                    print("updateTickerPrice for watchlist")
+                                    return
+                                }
+                            }
                             return
                         }
                         stockListVM.portfolioItems[index].stock = newstock
+                        for (index,stockVM) in stockListVM.stocks.enumerated() {//get current stock from stockListVM
+                            if(stockVM.ticker == ticker) {
+                                let newWatchStock = stockListVM.stocks[index].stock //get current stock from stockListVM
+                                newWatchStock.price = stockPriceInfo[0]["last"].doubleValue
+                                newWatchStock.change = stockPriceInfo[0]["last"].doubleValue - stockPriceInfo[0]["prevClose"].doubleValue
+                                newWatchStock.numShares = newstock.numShares
+                                stockListVM.stocks[index].stock = newWatchStock
+                                print("updateTickerPrice for watchlist")
+                                return
+                            }
+                        }
+                        stockListVM.getNetworth()
                         print("updateTickerPrice for portfolio")
                         return
                     }
@@ -171,6 +206,7 @@ class Webservice {
                         newstock.change = stockPriceInfo[0]["last"].doubleValue - stockPriceInfo[0]["prevClose"].doubleValue
                         newstock.numShares += numShares
                         stockListVM.stocks[index].stock = newstock
+                        stockListVM.getNetworth()
                         print("updateTickerPrice for watchlist")
                         return
                     }
@@ -196,7 +232,7 @@ class Webservice {
             }
         }
         
-        for index in 0..<stockListVM.portfolioItems.count {//iterate all stockViewModel within StockListVM
+        for index in 0..<stockListVM.portfolioItems.count {//iterate all portfolioItems within StockListVM
             let ticker = stockListVM.portfolioItems[index].stock.ticker
             let url = "http://angularfinance-env.eba-m6bbnkf3.us-east-1.elasticbeanstalk.com/api/pricesummary/"+ticker //unique URL
             print("refreshed!")
@@ -211,6 +247,7 @@ class Webservice {
                 print("after update for \(stockListVM.portfolioItems[index].stock.ticker) \( stockListVM.portfolioItems[index].stock.price)")
             }
         }
+        stockListVM.getNetworth()
     }
     
     //given a detailVM, update the stockPriceSummaryItem contained in the detailVM

@@ -162,6 +162,7 @@ struct DetailStockView: View {
                                         Text("Mid: " + self.detailVM.getMid())
                                             .font(.body)
                                             .padding(.leading, -18.0)
+                                            .offset(x:10)
                                         
                                         Text("Bid Price: " + self.detailVM.getBidPrice())
                                             .font(.body)

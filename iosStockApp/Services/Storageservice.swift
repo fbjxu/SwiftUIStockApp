@@ -55,11 +55,11 @@ class Storageservice {
 //            if let portfolioEncoded = try? JSONEncoder().encode(portfolioList) {
 //                UserDefaults.standard.set(portfolioEncoded, forKey: "portfolioItems")
 //            }
-//            
+//
 //            if let cashEncoded = try? JSONEncoder().encode(storedCash) {
 //                UserDefaults.standard.set(cashEncoded, forKey: "cash")
 //            }
-//            
+            
             /*************** set up local storage *****************/
             if (storedPortfolioObjs != nil) { //local storage already exists
                 storedPortfolioItems = try JSONDecoder().decode([PortfolioItem].self, from: storedPortfolioObjs as! Data)
@@ -120,7 +120,6 @@ class Storageservice {
             if (storedPortfolioObjs != nil) {
                 storedPortfolioItems = try JSONDecoder().decode([PortfolioItem].self, from: storedPortfolioObjs as! Data)
             }
-            print("Retrieved items: \(storedPortfolioItems)")
             return storedPortfolioItems
         } catch let err {
             print(err)
@@ -162,13 +161,13 @@ class Storageservice {
                     Webservice().updateTickerAPI(inputTicker, listVM, true, numShares) //update the list and ask for the latest stock price
                     Webservice().updateTickerAPI(inputTicker, listVM, false, numShares) //update watchlist; this method is soft: only update when the item in list
                     UserDefaults.standard.set(encoded, forKey: "portfolioItems") //update local storage
-                    if let encodedCash = try? JSONEncoder().encode(Cash(cash: oldCash-price * numShares)) {
-                        UserDefaults.standard.set(encodedCash, forKey: "cash")//update local storage cash
-                    }
                     print("buyStock ", String(data: encoded, encoding: .utf8)!) //debug
                 }
                 listVM.cash -= price * numShares
-                listVM.getNetworth()
+                if let encodedCash = try? JSONEncoder().encode(Cash(cash: oldCash-price * numShares)) {
+                    UserDefaults.standard.set(encodedCash, forKey: "cash")//update local storage cash
+                }
+//                listVM.getNetworth()
                 return
             }
         }
@@ -178,13 +177,13 @@ class Storageservice {
         if let encoded = try? JSONEncoder().encode(oldPortfolioList) {
             Webservice().addTickerAPI(inputTicker, listVM, true, numShares) //add this new ticker and ask for the latest stock price
             UserDefaults.standard.set(encoded, forKey: "portfolioItems") //update local storage
-            if let encodedCash = try? JSONEncoder().encode(Cash(cash: oldCash-price * numShares)) {
-                UserDefaults.standard.set(encodedCash, forKey: "cash")//update local storage cash
-            }
             print("buyStock ", String(data: encoded, encoding: .utf8)!) //debug
         }
         listVM.cash -= price * numShares
-        listVM.getNetworth()
+        if let encodedCash = try? JSONEncoder().encode(Cash(cash: oldCash-price * numShares)) {
+            UserDefaults.standard.set(encodedCash, forKey: "cash")//update local storage cash
+        }
+//        listVM.getNetworth()
         return        
     }
     
@@ -205,13 +204,13 @@ class Storageservice {
                         Webservice().updateTickerAPI(inputTicker, listVM, true, -numShares) //update the list and ask for the latest stock price
                         Webservice().updateTickerAPI(inputTicker, listVM, false, -numShares) //update watchlist; this method is soft: only update when the item in list
                         UserDefaults.standard.set(encoded, forKey: "portfolioItems") //update local storage
-                        if let encodedCash = try? JSONEncoder().encode(Cash(cash: oldCash-price * numShares)) {
-                            UserDefaults.standard.set(encodedCash, forKey: "cash")//update local storage cash
-                        }
                         print("sellStock ", String(data: encoded, encoding: .utf8)!) //debug
                     }
                     listVM.cash += price * numShares
-                    listVM.getNetworth()
+                    if let encodedCash = try? JSONEncoder().encode(Cash(cash: oldCash+price * numShares)) {
+                        UserDefaults.standard.set(encodedCash, forKey: "cash")//update local storage cash
+                    }
+//                    listVM.getNetworth()
                     return
                 }
                 oldPortfolioList[index] = updatePortfolioEntry //update existing portfolio list
@@ -220,13 +219,13 @@ class Storageservice {
                     Webservice().updateTickerAPI(inputTicker, listVM, true, -numShares) //update the list and ask for the latest stock price
                     Webservice().updateTickerAPI(inputTicker, listVM, false, -numShares) //update watchlist; this method is soft: only update when the item in list
                     UserDefaults.standard.set(encoded, forKey: "portfolioItems") //update local storage
-                    if let encodedCash = try? JSONEncoder().encode(Cash(cash: oldCash-price * numShares)) {
-                        UserDefaults.standard.set(encodedCash, forKey: "cash")//update local storage cash
-                    }
                     print("sellStock ", String(data: encoded, encoding: .utf8)!) //debug
                 }
                 listVM.cash += price * numShares
-                listVM.getNetworth()
+                if let encodedCash = try? JSONEncoder().encode(Cash(cash: oldCash+price * numShares)) {
+                    UserDefaults.standard.set(encodedCash, forKey: "cash")//update local storage cash
+                }
+//                listVM.getNetworth()
                 return
             }
         }
@@ -238,7 +237,7 @@ class Storageservice {
         oldWatchList.append(WatchListItem(ticker: inputTicker))
         self.watchList = oldWatchList
         if let encoded = try? JSONEncoder().encode(oldWatchList) {
-            Webservice().addTickerAPI(inputTicker, listVM) //this add the new ticker and ask for the latest stock price
+            Webservice().addTickerAPI(inputTicker, listVM, false, self.getNumShares(inputTicker), DispatchGroup()) //this add the new ticker and ask for the latest stock price
             UserDefaults.standard.set(encoded, forKey: "watchlistItems")
             print("addWatchlistItem ", String(data: encoded, encoding: .utf8)!)
         }
@@ -277,7 +276,7 @@ class Storageservice {
         for(_, element) in oldPortfolioList.enumerated() {
             if(element.ticker.uppercased() == inputTicker.uppercased()) {
                 res = element.numShares
-                break
+                return res
             }
         }
         return res
