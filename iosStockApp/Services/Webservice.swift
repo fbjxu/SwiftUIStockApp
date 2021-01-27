@@ -50,8 +50,8 @@ class Webservice {
     func getNews(_ ticker: String, _ detailVM: DetailViewModel, _ group: DispatchGroup = DispatchGroup()) {
         group.enter()
         print("called get news")
-        group.leave() //TODO: remove
-        return//TODO: remove
+//        group.leave() //TODO: remove
+//        return//TODO: remove
         let url = "http://stockappchart-env.eba-xpd25bx3.us-east-2.elasticbeanstalk.com/api/news/"+ticker //unique URL
         AF.request(url).validate().responseData{ (response) in
             if(response.data == nil) {
